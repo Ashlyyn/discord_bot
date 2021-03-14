@@ -46,10 +46,41 @@ public:
 			}
 		}
 
+
+		else if (message.startsWith(prefix + "nologs")) {
+			if (checkPermissions(message.author, ADMIN) == true) {
+				logsDisable();
+			}
+		}
+
+		else if (message.startsWith(prefix + "logs disable")) {
+			if (checkPermissions(message.author, ADMIN) == true) {
+				logsDisable();
+			}
+		}
+
+		else if (message.startsWith(prefix + "logs enable")) {
+			if (checkPermissions(message.author, ADMIN) == true) {
+				logsDisable(false);
+			}
+		}
+
 		else if (message.startsWith(prefix + "logs ")) {
 			if(checkPermissions(message.author, ADMIN) == true) {
 				setLogsChannel(SleepyDiscord::Snowflake<SleepyDiscord::Channel>(getSnowflake(message.content.substr(prefix.size() + strlen("logs ")))));
 				logAction("Logs enabled in " + message.content.substr(prefix.size() + strlen("logs ")));
+			}
+		}
+		
+		else if (message.startsWith(prefix + "silent")) {
+			if (checkPermissions(message.author, ADMIN) == true) {
+				setSilent();
+			}
+		}
+
+		else if (message.startsWith(prefix + "nosilent")) {
+			if (checkPermissions(message.author, ADMIN) == true) {
+				setSilent(false);
 			}
 		}
 
@@ -95,7 +126,7 @@ public:
 		}
 
 		else if(message.startsWith(prefix)) {
-			sendMessage(message.channelID, "Unknown command.");
+			echo(message.channelID, "Unknown command.");
 		}
 
 		if(isMuted(message.author.ID)) {
@@ -104,6 +135,8 @@ public:
 	}
 
 protected:
+	bool silent = false;
+	bool noLogs = false;
 	std::string prefix = "F!";
 	SleepyDiscord::Snowflake<SleepyDiscord::Channel> logsChannel;
 	std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> > mutedUsers;
@@ -128,11 +161,13 @@ protected:
 	}
 
 	void hello(const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const SleepyDiscord::User& user) {
-		sendMessage(channel, "Hello, " + user.username);
+		echo(channel, "Hello, " + user.username);
 	}
 
 	void echo(const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const std::string& message) {
-		sendMessage(channel, message);
+		if (silent == false) {
+			sendMessage(channel, message);
+		}
 	}
 
 	void muteVoice(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User>& user) {
@@ -159,8 +194,20 @@ protected:
 		logsChannel = channel;
 	}
 
+	void logsDisable(bool b = true) {
+		noLogs = b;
+	}
+
+	void setSilent(bool b = true) {
+		silent = b;
+	}
+
 	void logAction(const std::string& str) {
-		sendMessage(logsChannel, str);
+		if (noLogs == false) {
+			if (logsChannel != SleepyDiscord::Snowflake<SleepyDiscord::Channel>()) {
+				echo(logsChannel, str);
+			}
+		}
 	}
 
 	void setPermissions(COMMAND_PERMISSION commandPerm, COMMAND_TYPE commandType) {
@@ -173,7 +220,7 @@ protected:
 	}
 
 	void die(const SleepyDiscord::Snowflake<SleepyDiscord::Channel> channel) {
-		sendMessage(channel, "Okay.");
+		echo(channel, "Okay.");
 		exit(0);
 	}
 
