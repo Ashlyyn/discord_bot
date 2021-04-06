@@ -1,94 +1,94 @@
 #include "bot_client.hpp"
 
 void MyClientClass::onMessage(SleepyDiscord::Message message) {
-	if (message.startsWith(m_prefix + "prefix ")) {
+	if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "prefix ")) {
 		if(checkPermissions(message.member, ADMIN) == true) {
-			changePrefix(message.content.substr(m_prefix.size() + strlen("prefix ")));
+			changePrefix(message.content.substr(m_serverBotSettings[message.serverID].prefix.size() + strlen("prefix ")));
 		}
 	}
-	else if (message.startsWith(m_prefix + "hello")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "hello")) {
 		if(checkPermissions(message.member, NON_ADMIN) == true) {
 			hello(message.channelID, message.author);
 		}
 	}
 
-	else if (message.startsWith(m_prefix + "echo ")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "echo ")) {
 		if(checkPermissions(message.member, NON_ADMIN) == true) {
-			echo(message.channelID, message.content.substr(m_prefix.size() + strlen("echo ")));
+			echo(message.channelID, message.content.substr(m_serverBotSettings[message.serverID].prefix.size() + strlen("echo ")));
 		}
 	}
 
-	else if (message.startsWith(m_prefix + "mute voice ")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "mute voice ")) {
 		if(checkPermissions(message.member, ADMIN) == true) {
-			muteVoice(message.serverID, message.content.substr(m_prefix.size() + strlen("mute voice ")));
+			muteVoice(message.serverID, message.content.substr(m_serverBotSettings[message.serverID].prefix.size() + strlen("mute voice ")));
 		}
 	}
 
-	else if (message.startsWith(m_prefix + "unmute voice ")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "unmute voice ")) {
 		if(checkPermissions(message.member, ADMIN) == true) {
-			unmuteVoice(message.serverID, message.content.substr(m_prefix.size() + strlen("unmute voice ")));
+			unmuteVoice(message.serverID, message.content.substr(m_serverBotSettings[message.serverID].prefix.size() + strlen("unmute voice ")));
 		}
 	}
 
-	else if (message.startsWith(m_prefix + "mute text ")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "mute text ")) {
 		if(checkPermissions(message.member, ADMIN) == true) {
-			muteText(message.serverID, getSnowflake(message.content.substr(m_prefix.size() + strlen("mute text "))));
+			muteText(message.serverID, getSnowflake(message.content.substr(m_serverBotSettings[message.serverID].prefix.size() + strlen("mute text "))));
 		}
 	}
 
-	else if (message.startsWith(m_prefix + "unmute text ")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "unmute text ")) {
 		if(checkPermissions(message.member, ADMIN) == true) {
-			unmuteText(message.serverID, getSnowflake(message.content.substr(m_prefix.size() + strlen("unmute text "))));
+			unmuteText(message.serverID, getSnowflake(message.content.substr(m_serverBotSettings[message.serverID].prefix.size() + strlen("unmute text "))));
 		}
 	}
 
 
-	else if (message.startsWith(m_prefix + "bot_admin_role set ")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "bot_admin_role set ")) {
 		if (checkPermissions(message.member, ADMIN) == true) {
 		auto words = split(message.content);
-			setBotAdminRole(getSnowflake(message.content.substr(m_prefix.size() + strlen("bot_admin_role set "))));
+			setBotAdminRole(getSnowflake(message.content.substr(m_serverBotSettings[message.serverID].prefix.size() + strlen("bot_admin_role set "))));
 			logAction("**BOT ADMIN ROLE SET**\n```Set to: " + words[2] + "\nSet by: " + message.author.username + "#" + message.author.discriminator + "\n```");
 		}
 	}
 
-	else if (message.startsWith(m_prefix + "nologs")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "nologs")) {
 		if (checkPermissions(message.member, ADMIN) == true) {
 			logsDisable();
 		}
 	}
 
-	else if (message.startsWith(m_prefix + "logs disable")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "logs disable")) {
 		if (checkPermissions(message.member, ADMIN) == true) {
 			logsDisable();
 		}
 	}
 
-	else if (message.startsWith(m_prefix + "logs enable")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "logs enable")) {
 		if (checkPermissions(message.member, ADMIN) == true) {
 			logsDisable(false);
 		}
 	}
 
-	else if (message.startsWith(m_prefix + "logs ")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "logs ")) {
 		if(checkPermissions(message.member, ADMIN) == true) {
-			setLogsChannel(SleepyDiscord::Snowflake<SleepyDiscord::Channel>(getSnowflake(message.content.substr(m_prefix.size() + strlen("logs ")))));
-			logAction("Logs enabled in " + message.content.substr(m_prefix.size() + strlen("logs ")));
+			setLogsChannel(SleepyDiscord::Snowflake<SleepyDiscord::Channel>(getSnowflake(message.content.substr(m_serverBotSettings[message.serverID].prefix.size() + strlen("logs ")))));
+			logAction("Logs enabled in " + message.content.substr(m_serverBotSettings[message.serverID].prefix.size() + strlen("logs ")));
 		}
 	}
 		
-	else if (message.startsWith(m_prefix + "silent")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "silent")) {
 		if (checkPermissions(message.member, ADMIN) == true) {
 			setSilent();
 		}
 	}
 
-	else if (message.startsWith(m_prefix + "nosilent")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "nosilent")) {
 		if (checkPermissions(message.member, ADMIN) == true) {
 			setSilent(false);
 		}
 	}
 
-	else if (message.startsWith(m_prefix + "delete ")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "delete ")) {
 		if(checkPermissions(message.member, ADMIN) == true) {
 			std::string log;
 			std::vector<std::string> words = split(message.content);
@@ -104,7 +104,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message message) {
 		}
     }
 
-	else if (message.startsWith(m_prefix + "permissions set ")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "permissions set ")) {
 		if(checkPermissions(message.member, ADMIN) == true) {
 			auto words = split(message.content);
 			std::map<std::string, COMMAND_PERMISSION> perms = {
@@ -122,13 +122,13 @@ void MyClientClass::onMessage(SleepyDiscord::Message message) {
 		}
 	}
 
-	else if (message.startsWith(m_prefix + "die")) {
+	else if (message.startsWith(m_serverBotSettings[message.serverID].prefix + "die")) {
 		if(checkPermissions(message.member, ADMIN) == true) {
 			die(message.channelID);
 		}
 	}
 
-	else if(message.startsWith(m_prefix)) {
+	else if(message.startsWith(m_serverBotSettings[message.serverID].prefix)) {
 		echo(message.channelID, "Unknown command.");
 	}
 
@@ -137,23 +137,28 @@ void MyClientClass::onMessage(SleepyDiscord::Message message) {
 	}
 }
 
-/*
 void MyClientClass::onServer(SleepyDiscord::Server server) {
     SleepyDiscord::Snowflake<SleepyDiscord::Server> snowflake = server;
-    m_serverBotSettings.emplace(snowflake, ServerBotSettings { false, false, "F!", nullptr, nullptr, nullptr } );
+    m_serverBotSettings.emplace(snowflake, 
+        ServerBotSettings { 
+            false, false, "F!",
+            SleepyDiscord::Snowflake<SleepyDiscord::Channel>(),
+	        SleepyDiscord::Snowflake<SleepyDiscord::Role>(),
+	        std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> >()
+        } 
+    );
 }
-*/
 
-void MyClientClass::changePrefix(const std::string& newPrefix) {
-	m_prefix = newPrefix;
+void MyClientClass::changePrefix(const SleepyDiscord::Snowflake<SleepyDiscord::Server> server, std::string& newPrefix) {
+	m_serverBotSettings[server].prefix = newPrefix;
 }
 
 void MyClientClass::hello(const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const SleepyDiscord::User& user) {
 	echo(channel, "Hello, " + user.username);
 }
 
-void MyClientClass::echo(const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const std::string& message) {
-	if (m_silent == false) {
+void MyClientClass::echo(const SleepyDiscord::Channel& channel, const std::string& message) {
+	if (m_serverBotSettings[channel.serverID].silent == false) {
 		sendMessage(channel, message);
 	}
 }
@@ -167,47 +172,47 @@ void MyClientClass::unmuteVoice(const SleepyDiscord::Snowflake<SleepyDiscord::Se
 }
 
 void MyClientClass::muteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User> user) {
-	if(std::count(m_mutedUsers.begin(), m_mutedUsers.end(), user) == 0) {
-		m_mutedUsers.push_back(user);
+	if(std::count(m_serverBotSettings[server].mutedUsers.begin(), m_serverBotSettings[server].mutedUsers.end(), user) == 0) {
+		m_serverBotSettings[server].mutedUsers.push_back(user);
 	}
 }
 
 void MyClientClass::unmuteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User> user) {
-	if(std::count(m_mutedUsers.begin(), m_mutedUsers.end(), user) > 0) {
-		m_mutedUsers.erase(std::find(m_mutedUsers.begin(), m_mutedUsers.end(), user));
+	if(std::count(m_serverBotSettings[server].mutedUsers.begin(), m_serverBotSettings[server].mutedUsers.end(), user) > 0) {
+		m_serverBotSettings[server].mutedUsers.erase(std::find(m_serverBotSettings[server].mutedUsers.begin(), m_serverBotSettings[server].mutedUsers.end(), user));
 	}
 }
 
-void MyClientClass::setBotAdminRole(const SleepyDiscord::Snowflake<SleepyDiscord::Role>& role) {
-	m_botAdminRole = role;
+void MyClientClass::setBotAdminRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, SleepyDiscord::Snowflake<SleepyDiscord::Role>& role) {
+	m_serverBotSettings[server].botAdminRole = role;
 }
 
-void MyClientClass::setLogsChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel) {
-	m_logsChannel = channel;
+void MyClientClass::setLogsChannel(const SleepyDiscord::Channel& channel) {
+	m_serverBotSettings[server].logsChannel = channel;
 }
 
-void MyClientClass::logsDisable(bool b) {
-	m_noLogs = b;
+void MyClientClass::logsDisable(const SleepyDiscord::Snowflake<SleepyDiscord::Server> server, bool b) {
+	m_serverBotSettings[server].noLogs = b;
 }
 
-void MyClientClass::setSilent(bool b) {
-	m_silent = b;
+void MyClientClass::setSilent(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, bool b) {
+	m_serverBotSettings[server].silent = b;
 }
 
-void MyClientClass::logAction(const std::string& str) {
-	if (m_noLogs == false) {
-		if (m_logsChannel != SleepyDiscord::Snowflake<SleepyDiscord::Channel>()) {
-			echo(m_logsChannel, str);
+void MyClientClass::logAction(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const std::string& str) {
+	if (m_serverBotSettings[server].noLogs == false) {
+		if (m_serverBotSettings[server].logsChannel != SleepyDiscord::Snowflake<SleepyDiscord::Channel>()) {
+			echo(m_serverBotSettings[server].logsChannel, str);
 		}
 	}
 }
 
-void MyClientClass::setPermissions(COMMAND_PERMISSION commandPerm, COMMAND_TYPE commandType) {
+void MyClientClass::setPermissions(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, COMMAND_PERMISSION commandPerm, COMMAND_TYPE commandType) {
 	if(commandType == ROLE_ALL) {
-		m_permissions[COMMAND_TYPE::ADMIN] = commandPerm;
-		m_permissions[COMMAND_TYPE::NON_ADMIN] = commandPerm;
+		m_serverBotSettings[server].permissions[COMMAND_TYPE::ADMIN] = commandPerm;
+		m_serverBotSettings[server].permissions[COMMAND_TYPE::NON_ADMIN] = commandPerm;
 	} else {
-		m_permissions[commandType] = commandPerm;
+		m_serverBotSettings[server].permissions[commandType] = commandPerm;
 	}
 }
 
@@ -252,8 +257,8 @@ std::string MyClientClass::getSnowflake(const std::string str) {
 	else throw std::runtime_error("getSnowflake(): string is not a member, role, or channel mention.");
 }
 
-bool MyClientClass::isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::User>& user) {
-	if(std::count(m_mutedUsers.begin(), m_mutedUsers.end(), user) >= 1) {
+bool MyClientClass::isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::ServerMember>& member) {
+	if(std::count(m_serverBotSettings[server].mutedUsers.begin(), m_serverBotSettings[server].mutedUsers.end(), member) >= 1) {
 		return true;
 	} else {
 		return false;
@@ -279,14 +284,14 @@ bool MyClientClass::isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>&
 	}
 }
 
-bool MyClientClass::checkPermissions(const SleepyDiscord::ServerMember& member, COMMAND_TYPE commandType) {
-	if(m_permissions[commandType] == OWNER_ONLY && isOwner(member.user.ID)) {
+bool MyClientClass::checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, SleepyDiscord::ServerMember& member, COMMAND_TYPE commandType) {
+	if(m_serverBotSettings[server].permissions[commandType] == OWNER_ONLY && isOwner(member.user.ID)) {
 		return true;
 	} 
-	else if ((m_permissions[commandType] == BOT_ADMIN && hasRole(member, m_botAdminRole)) || isOwner(member.user.ID)) {
+	else if ((m_serverBotSettings[server].permissions[commandType] == BOT_ADMIN && hasRole(member, m_serverBotSettings[server].botAdminRole)) || isOwner(member.user.ID)) {
 		return true;
 	}
-	else if (m_permissions[commandType] == CMD_ALL) {
+	else if (m_serverBotSettings[server].permissions[commandType] == CMD_ALL) {
 		return true;
 	}
 	else {
