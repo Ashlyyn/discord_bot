@@ -2,6 +2,7 @@
 #define _BOT_CLIENT_H_
 
 #include <array>
+#include <map>
 #include <vector>
 
 #include "sleepy_discord/sleepy_discord.h"
@@ -42,9 +43,50 @@ protected:
 			SleepyDiscord::Snowflake<SleepyDiscord::Role>();
 			std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> >();
 		}
+
+		bool operator==(const ServerBotSettings& rhs) const {
+			if((silent == rhs.silent) && (noLogs == rhs.noLogs) && (prefix == rhs.prefix) 
+				&& (logsChannel == rhs.logsChannel) && (botAdminRole == rhs.botAdminRole)
+				&& (mutedUsers == rhs.mutedUsers) && (permissions == rhs.permissions)
+			) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		bool operator!=(const ServerBotSettings& rhs) const {
+			if(!operator==(rhs)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
     };
 
-    std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, ServerBotSettings> m_serverBotSettings;
+	struct ServerBotSettingsComparator {
+		bool operator()(const ServerBotSettings& lhs, const ServerBotSettings& rhs) const {
+			if(lhs == ServerBotSettings() && rhs != ServerBotSettings()) {
+				return 0;
+			}
+			else {
+				return 1;
+			}
+		}
+
+		bool operator()(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& lhs, const SleepyDiscord::Snowflake<SleepyDiscord::Server>& rhs) const {
+			if(lhs == SleepyDiscord::Snowflake<SleepyDiscord::Server>() && rhs != SleepyDiscord::Snowflake<SleepyDiscord::Server>()) {
+				return 0;
+			}
+			else {
+				return 1;
+			}
+		}
+	};
+
+    std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, ServerBotSettings, ServerBotSettingsComparator> m_serverBotSettings;
 
 	void changePrefix(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const std::string& newPrefix);
 	void hello(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const SleepyDiscord::ServerMember& member);
