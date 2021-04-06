@@ -138,8 +138,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message message) {
 }
 
 void MyClientClass::onServer(SleepyDiscord::Server server) {
-    SleepyDiscord::Snowflake<SleepyDiscord::Server> snowflake = server;
-    m_serverBotSettings.emplace(snowflake, ServerBotSettings { false, false, "F!", nullptr, nullptr, nullptr } );
+    //m_serverBotSettings.emplace(server, ServerBotSettings());
 }
 
 void MyClientClass::changePrefix(const std::string& newPrefix) {
@@ -164,13 +163,13 @@ void MyClientClass::unmuteVoice(const SleepyDiscord::Snowflake<SleepyDiscord::Se
 	muteServerMember(server, user, false);
 }
 
-void MyClientClass::muteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User> user) {
+void MyClientClass::muteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User>& user) {
 	if(std::count(m_mutedUsers.begin(), m_mutedUsers.end(), user) == 0) {
 		m_mutedUsers.push_back(user);
 	}
 }
 
-void MyClientClass::unmuteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User> user) {
+void MyClientClass::unmuteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User>& user) {
 	if(std::count(m_mutedUsers.begin(), m_mutedUsers.end(), user) > 0) {
 		m_mutedUsers.erase(std::find(m_mutedUsers.begin(), m_mutedUsers.end(), user));
 	}
@@ -209,12 +208,12 @@ void MyClientClass::setPermissions(COMMAND_PERMISSION commandPerm, COMMAND_TYPE 
 	}
 }
 
-void MyClientClass::die(const SleepyDiscord::Snowflake<SleepyDiscord::Channel> channel) {
+void MyClientClass::die(const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel) {
 	echo(channel, "Okay.");
 	exit(0);
 }
 
-std::vector<std::string> MyClientClass::split(std::string string) {
+std::vector<std::string> MyClientClass::split(const std::string& string) {
 	std::vector<std::string> vec;
 	int pos = 0;
 	while (1) {
@@ -237,7 +236,7 @@ std::vector<std::string> MyClientClass::split(std::string string) {
 	return vec;
 }
 
-std::string MyClientClass::getSnowflake(const std::string str) {
+std::string MyClientClass::getSnowflake(const std::string& str) {
 	if(str.find("<@!") != std::string::npos) {
 		return str.substr(3, str.size() - 3 - 1);
 	}

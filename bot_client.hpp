@@ -21,7 +21,16 @@ protected:
 	    SleepyDiscord::Snowflake<SleepyDiscord::Channel> logsChannel;
 	    SleepyDiscord::Snowflake<SleepyDiscord::Role> botAdminRole;
 	    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> > mutedUsers;
-    };
+		std::array<int, 2> permissions = {
+			COMMAND_PERMISSION::CMD_ALL, COMMAND_PERMISSION::CMD_ALL
+		};
+
+		ServerBotSettings() {
+			logsChannel = SleepyDiscord::Snowflake<SleepyDiscord::Channel>();
+			botAdminRole = SleepyDiscord::Snowflake<SleepyDiscord::Role>();
+			mutedUsers = std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> >();
+		}
+	};
 
 	enum COMMAND_PERMISSION {
 		OWNER_ONLY,
@@ -42,10 +51,10 @@ protected:
 	SleepyDiscord::Snowflake<SleepyDiscord::Role> m_botAdminRole;
 	std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> > m_mutedUsers;
 
-    std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, ServerBotSettings> m_serverBotSettings;
+    std::map<SleepyDiscord::Server, ServerBotSettings&> m_serverBotSettings;
 
 	std::array<int, 2> m_permissions = {
-		COMMAND_PERMISSION::CMD_ALL, COMMAND_PERMISSION::CMD_ALL
+			COMMAND_PERMISSION::CMD_ALL, COMMAND_PERMISSION::CMD_ALL
 	};
 
 	void changePrefix(const std::string& newPrefix);
@@ -53,20 +62,20 @@ protected:
 	void echo(const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const std::string& message);
 	void muteVoice(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User>& user);
 	void unmuteVoice(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User>& user);
-	void muteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User> user);
-	void unmuteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User> user);
+	void muteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User>& user);
+	void unmuteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User>& user);
 	void setBotAdminRole(const SleepyDiscord::Snowflake<SleepyDiscord::Role>& role);
 	void setLogsChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel);
 	void logsDisable(bool b = true);
 	void setSilent(bool b = true);
 	void logAction(const std::string& str);
 	void setPermissions(COMMAND_PERMISSION commandPerm, COMMAND_TYPE commandType);
-	void die(const SleepyDiscord::Snowflake<SleepyDiscord::Channel> channel);
+	void die(const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel);
 
 
 private:
-	static std::vector<std::string> split(std::string string);
-	static std::string getSnowflake(const std::string str);
+	static std::vector<std::string> split(const std::string& string);
+	static std::string getSnowflake(const std::string& str);
 	bool isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::User>& user);
 	static bool hasRole(const SleepyDiscord::ServerMember& member, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& role);
 	static bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& user);
