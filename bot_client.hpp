@@ -11,10 +11,9 @@ public:
 	using SleepyDiscord::DiscordClient::DiscordClient;
 
 	void onMessage(SleepyDiscord::Message message) override;
-    //void onServer(SleepyDiscord::Server server) override;
+    void onServer(SleepyDiscord::Server server) override;
 
 protected:
-    /*
     struct ServerBotSettings {
         bool silent = false;
 	    bool noLogs = false;
@@ -23,7 +22,6 @@ protected:
 	    SleepyDiscord::Snowflake<SleepyDiscord::Role> botAdminRole;
 	    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> > mutedUsers;
     };
-    */
 
 	enum COMMAND_PERMISSION {
 		OWNER_ONLY,
@@ -37,14 +35,7 @@ protected:
 		ROLE_ALL
 	};
 
-    bool m_silent = false;
-	bool m_noLogs = false;
-	std::string m_prefix = "F!";
-	SleepyDiscord::Snowflake<SleepyDiscord::Channel> m_logsChannel;
-    SleepyDiscord::Snowflake<SleepyDiscord::Role> m_botAdminRole;
-	std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> > m_mutedUsers;
-
-    //std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, ServerBotSettings> m_serverBotSettings;
+    std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, ServerBotSettings> m_serverBotSettings;
 
 	std::array<int, 2> m_permissions = {
 		COMMAND_PERMISSION::CMD_ALL, COMMAND_PERMISSION::CMD_ALL
