@@ -137,12 +137,10 @@ void MyClientClass::onMessage(SleepyDiscord::Message message) {
 	}
 }
 
-/*
 void MyClientClass::onServer(SleepyDiscord::Server server) {
     SleepyDiscord::Snowflake<SleepyDiscord::Server> snowflake = server;
     m_serverBotSettings.emplace(snowflake, ServerBotSettings { false, false, "F!", nullptr, nullptr, nullptr } );
 }
-*/
 
 void MyClientClass::changePrefix(const std::string& newPrefix) {
 	m_prefix = newPrefix;

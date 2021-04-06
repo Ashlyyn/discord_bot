@@ -35,6 +35,13 @@ protected:
 		ROLE_ALL
 	};
 
+    bool m_silent = false;
+	bool m_noLogs = false;
+	std::string m_prefix = "F!";
+	SleepyDiscord::Snowflake<SleepyDiscord::Channel> m_logsChannel;
+	SleepyDiscord::Snowflake<SleepyDiscord::Role> m_botAdminRole;
+	std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> > m_mutedUsers;
+
     std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, ServerBotSettings> m_serverBotSettings;
 
 	std::array<int, 2> m_permissions = {
