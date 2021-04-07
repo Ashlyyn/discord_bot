@@ -89,7 +89,7 @@ protected:
     std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, ServerBotSettings, ServerBotSettingsComparator> m_serverBotSettings;
 
 	void changePrefix(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const std::string& newPrefix);
-	void hello(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const SleepyDiscord::ServerMember& member);
+	void hello(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const SleepyDiscord::User& user);
 	void echo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const std::string& message);
 	void muteVoice(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User>& user);
 	void unmuteVoice(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User>& user);
