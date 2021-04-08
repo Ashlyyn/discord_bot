@@ -14,21 +14,23 @@ class MyClientClass : public SleepyDiscord::DiscordClient {
 public:
 	using SleepyDiscord::DiscordClient::DiscordClient;
 
-	Command changePrefix 	= Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_changePrefix);
-	Command hello 			= Command(this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_hello);
-	Command echo  			= Command(this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_echo );
-	Command muteVoice		= Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_muteVoice);
-	Command unmuteVoice		= Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_unmuteVoice);
-	Command muteText		= Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_muteText);
-	Command unmuteText		= Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_unmuteText);
-	Command setBotAdminRole = Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_setBotAdminRole);
-	Command logsDisable		= Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_logsDisable);
-	Command setLogsChannel	= Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_setLogsChannel);
-	Command setSilent		= Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_setSilent);
-	Command deleteMsg		= Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_deleteMsg);
-	Command logAction		= Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_logAction);
-	Command setPermissions	= Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_setPermissions);
-	Command die				= Command(this, Command::COMMAND_TYPE::ADMIN,	  &MyClientClass::fn_die);
+	Command changePrefix 	= Command("prefix",				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_changePrefix);
+	Command hello 			= Command("hello",				this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_hello);
+	Command echo  			= Command("echo",				this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_echo );
+	Command muteVoice		= Command("mute voice", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_muteVoice);
+	Command unmuteVoice		= Command("unmute voice", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unmuteVoice);
+	Command muteText		= Command("mute text", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_muteText);
+	Command unmuteText		= Command("unmute text", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unmuteText);
+	Command setBotAdminRole = Command("bot_admin_role set", this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_setBotAdminRole);
+	Command logsDisable		= Command("logs disable", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_logsDisable);
+	Command logsEnable		= Command("logs enable", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_logsDisable);
+	Command setLogsChannel	= Command("logs", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_setLogsChannel);
+	Command setSilent		= Command("silent",				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_setSilent);
+	Command noSilent 		= Command("nosilent", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_logsDisable);
+	Command deleteMsg		= Command("message delete",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_deleteMsg);
+	Command logAction		= Command("log_action",			this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_logAction);
+	Command setPermissions	= Command("permissions set",	this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setPermissions);
+	Command die				= Command("die",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_die);
 
 	void onMessage(SleepyDiscord::Message message) override;
 
@@ -47,7 +49,7 @@ public:
 	std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, ServerBotSettings, ServerBotSettingsComparator> m_serverBotSettings;
 
 protected:
-	void fn_changePrefix	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const std::string& newPrefix);
+	void fn_changePrefix	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::ServerMember& member, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const std::string& newPrefix);
 	void fn_hello			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const SleepyDiscord::User& user);
 	void fn_echo			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const std::string& message);
 	void fn_muteVoice		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User>& user);

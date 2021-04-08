@@ -26,15 +26,19 @@ public:
 	};
 
     Command() {
+        m_name = std::string();
         m_client = nullptr;
         m_run = nullptr;
         m_commandType = COMMAND_TYPE::NON_ADMIN;
+        m_numParams = -1;
     }
 
-    template<typename ...Args> Command(MyClientClass* _client, COMMAND_TYPE commandType, void(MyClientClass::*fnptr)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, Args...)) {
-        m_client = _client;
+    template<typename ...Args> Command(const std::string& name, MyClientClass* client, COMMAND_TYPE commandType, void(MyClientClass::*fnptr)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, Args...)) {
+        m_name = name;
+        m_client = client;
         m_run = (void(MyClientClass::*)()) fnptr;
         m_commandType = commandType;
+        m_numParams = sizeof...(Args);
 
     }
 
@@ -45,9 +49,11 @@ public:
     }
 
 private:
+    std::string m_name;
     MyClientClass* m_client;
     void (MyClientClass::*m_run)();
     COMMAND_TYPE m_commandType;
+    int m_numParams;
 
     std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, COMMAND_TYPE, ServerBotSettingsComparator> permissions;
 

@@ -4,7 +4,7 @@
 void MyClientClass::onMessage(SleepyDiscord::Message message) {
 	const std::string& prefix = m_serverBotSettings[message.serverID].prefix;
 	if (message.startsWith(prefix + "prefix ")) {
-		changePrefix(message.serverID, message.member, message.content.substr(prefix.size() + strlen("prefix ")));
+		changePrefix(message.serverID, message.member, message.member, message.channelID, message.content.substr(prefix.size() + strlen("prefix ")));
 	}
 	else if (message.startsWith(prefix + "hello")) {
 		hello(message.serverID, message.member, message.channelID, message.author);
@@ -77,7 +77,10 @@ void MyClientClass::onMessage(SleepyDiscord::Message message) {
 	}
 }
 
-void MyClientClass::fn_changePrefix(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const std::string& newPrefix) {
+void MyClientClass::fn_changePrefix(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::ServerMember& member, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const std::string& newPrefix) {
+	if(newPrefix.find(" ") != std::string::npos) {
+		echo(server, member, channel, "Prefix may not contain whitespace.");
+	}
 	m_serverBotSettings[server].prefix = newPrefix;
 }
 
