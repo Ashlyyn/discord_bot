@@ -47,7 +47,7 @@ public:
 		ROLE_ALL
 	};
 
-	std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, SleepyDiscord::Server&, ServerBotSettingsComparator> m_servers;
+	std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, SleepyDiscord::Server, ServerBotSettingsComparator> m_servers;
 	std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, ServerBotSettings, ServerBotSettingsComparator> m_serverBotSettings;
 
 protected:
