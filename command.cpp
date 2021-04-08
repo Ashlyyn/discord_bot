@@ -12,8 +12,9 @@ bool Command::isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUs
 	}
 }
 
-bool Command::hasRole(const SleepyDiscord::ServerMember& acrMember, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRole) {
-	for (const auto& lMemberRole : acrMember.roles) {
+bool Command::hasRole(SleepyDiscord::Server& arServer, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRole) {
+	const SleepyDiscord::ServerMember& lcrMember = *arServer.findMember(acrUser);
+	for (const auto& lMemberRole : lcrMember.roles) {
 	    if (lMemberRole == acrRole) {
             return true;
 		}
@@ -21,14 +22,14 @@ bool Command::hasRole(const SleepyDiscord::ServerMember& acrMember, const Sleepy
 	return false;
 }
 
-bool Command::checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::ServerMember& acrMember) const {
-	if(m_client->m_serverBotSettings[arServer].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::OWNER_ONLY && isOwner(acrMember.user.ID)) {
+bool Command::checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServer, const SleepyDiscord::User& acrUser) const {
+	if(m_client->m_serverBotSettings[acrServer].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::OWNER_ONLY && isOwner(acrUser.ID)) {
     	return true;
 	} 
-    else if ((m_client->m_serverBotSettings[arServer].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::BOT_ADMIN && hasRole(acrMember, m_client->m_serverBotSettings[arServer].botAdminRole)) || isOwner(acrMember.user.ID)) {
+    else if (((m_client->m_serverBotSettings[acrServer].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::BOT_ADMIN) && (hasRole(m_client->m_servers.at(acrServer), acrUser, m_client->m_serverBotSettings[acrServer].botAdminRole))) || isOwner(acrUser.ID)) {
 		return true;
     }
-    else if (m_client->m_serverBotSettings[arServer].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::CMD_ALL) {
+    else if (m_client->m_serverBotSettings[acrServer].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::CMD_ALL) {
     	return true;
 	}
     else {

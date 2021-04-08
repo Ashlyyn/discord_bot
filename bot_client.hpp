@@ -32,7 +32,8 @@ public:
 	Command setPermissions	= Command("permissions set",	this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setPermissions);
 	Command die				= Command("die",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_die);
 
-	void onMessage(SleepyDiscord::Message message) override;
+	void onMessage(SleepyDiscord::Message aMessage) override;
+	void onServer(SleepyDiscord::Server aServer) override;
 
     enum COMMAND_PERMISSION {
 		OWNER_ONLY,
@@ -46,32 +47,33 @@ public:
 		ROLE_ALL
 	};
 
+	std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, SleepyDiscord::Server&, ServerBotSettingsComparator> m_servers;
 	std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, ServerBotSettings, ServerBotSettingsComparator> m_serverBotSettings;
 
 protected:
-	void fn_changePrefix	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::ServerMember& member, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const std::string& newPrefix);
-	void fn_hello			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const SleepyDiscord::User& user);
-	void fn_echo			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel, const std::string& message);
-	void fn_muteVoice		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User>& user);
-	void fn_unmuteVoice		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::User>& user);
-	void fn_muteText		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::ServerMember>& member);
-	void fn_unmuteText		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::ServerMember>& member);
-	void fn_setBotAdminRole	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::ServerMember& member, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& role);
-	void fn_setLogsChannel	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::ServerMember& member, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& channel);
-	void fn_logsDisable		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, bool b = true);
-	void fn_setSilent		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, bool b = true);
-	void fn_deleteMsg		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::ServerMember& member, SleepyDiscord::Message& message);
-	void fn_logAction		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::ServerMember& member, const std::string& str);
-	void fn_setPermissions	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::ServerMember& member, COMMAND_PERMISSION commandPerm, COMMAND_TYPE commandType);
-	void fn_die				(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::Channel> channel);
+	void fn_changePrefix	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannel, const std::string& acrNewPrefix);
+	void fn_hello			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannel);
+	void fn_echo			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannel, const std::string& acrMessage);
+	void fn_muteVoice		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser);
+	void fn_unmuteVoice		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser);
+	void fn_muteText		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser);
+	void fn_unmuteText		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser);
+	void fn_setBotAdminRole	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRole);
+	void fn_setLogsChannel	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannel);
+	void fn_logsDisable		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, bool b = true);
+	void fn_setSilent		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, bool b = true);
+	void fn_deleteMsg		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, SleepyDiscord::Message& arMessage);
+	void fn_logAction		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const std::string& acrString);
+	void fn_setPermissions	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, COMMAND_PERMISSION aCommandPerm, COMMAND_TYPE aCommandType);
+	void fn_die				(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannel);
 
 
 private:
-	static std::vector<std::string> split(const std::string& string);
-	static std::string getSnowflake(const std::string& str);
-	static COMMAND_TYPE toCommandType(const std::string& string);
-	static COMMAND_PERMISSION toCommandPerm(const std::string& string);
-	bool isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::Snowflake<SleepyDiscord::ServerMember>& member);
+	static std::vector<std::string> split(const std::string& acrString);
+	static std::string getSnowflake(const std::string& acrString);
+	static COMMAND_TYPE toCommandType(const std::string& acrString);
+	static COMMAND_PERMISSION toCommandPerm(const std::string& acrString);
+	bool isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUser);
 };
 
 #endif

@@ -13,7 +13,7 @@ struct ServerBotSettings {
 	std::string prefix = "F!";
 	SleepyDiscord::Snowflake<SleepyDiscord::Channel> logsChannel;
 	SleepyDiscord::Snowflake<SleepyDiscord::Role> botAdminRole;
-	std::vector<SleepyDiscord::Snowflake<SleepyDiscord::ServerMember> > mutedUsers;
+	std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User>> mutedUsers;
     std::array<int, 2> permissions = {
 		2, 2
 	};
