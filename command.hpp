@@ -33,18 +33,18 @@ public:
         m_numParams = -1;
     }
 
-    template<typename ...Args> Command(const std::string& name, MyClientClass* client, COMMAND_TYPE commandType, void(MyClientClass::*fnptr)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, Args...)) {
-        m_name = name;
-        m_client = client;
-        m_run = (void(MyClientClass::*)()) fnptr;
-        m_commandType = commandType;
+    template<typename ...Args> Command(const std::string& acrName, MyClientClass* apClient, COMMAND_TYPE aCommandType, void(MyClientClass::*fpFnptr)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, Args...)) {
+        m_name = acrName;
+        m_client = apClient;
+        m_run = (void(MyClientClass::*)()) fpFnptr;
+        m_commandType = aCommandType;
         m_numParams = sizeof...(Args);
 
     }
 
-    template<typename ...Args> void operator()(SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::ServerMember& member, Args... args) {
-        if(checkPermissions(server, member) == true) {
-            (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, Args...))m_run)(server, args...);
+    template<typename ...Args> void operator()(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::ServerMember& acrMember, Args... args) {
+        if(checkPermissions(arServer, acrMember) == true) {
+            (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, Args...))m_run)(arServer, args...);
         }
     }
 
@@ -55,11 +55,11 @@ private:
     COMMAND_TYPE m_commandType;
     int m_numParams;
 
-    std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, COMMAND_TYPE, ServerBotSettingsComparator> permissions;
+    std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, COMMAND_TYPE, ServerBotSettingsComparator> m_permissions;
 
-    static bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& user);
-    static bool hasRole(const SleepyDiscord::ServerMember& member, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& role);
-    bool checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::ServerMember& member) const;
+    static bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUser);
+    static bool hasRole(const SleepyDiscord::ServerMember& acrMember, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRole);
+    bool checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::ServerMember& acrMember) const;
 };
 
 

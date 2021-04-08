@@ -3,8 +3,8 @@
 
 #include "sleepy_discord/sleepy_discord.h"
 
-bool Command::isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& user) {
-	if (user == 518216114665291786) {
+bool Command::isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUser) {
+	if (acrUser == 518216114665291786) {
 		return true;
 	}
 	else {
@@ -12,23 +12,23 @@ bool Command::isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& user)
 	}
 }
 
-bool Command::hasRole(const SleepyDiscord::ServerMember& member, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& role) {
-	for (const auto& memberRole : member.roles) {
-	    if (memberRole == role) {
+bool Command::hasRole(const SleepyDiscord::ServerMember& acrMember, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRole) {
+	for (const auto& lMemberRole : acrMember.roles) {
+	    if (lMemberRole == acrRole) {
             return true;
 		}
 	}
 	return false;
 }
 
-bool Command::checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& server, const SleepyDiscord::ServerMember& member) const {
-	if(m_client->m_serverBotSettings[server].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::OWNER_ONLY && isOwner(member.user.ID)) {
+bool Command::checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::ServerMember& acrMember) const {
+	if(m_client->m_serverBotSettings[arServer].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::OWNER_ONLY && isOwner(acrMember.user.ID)) {
     	return true;
 	} 
-    else if ((m_client->m_serverBotSettings[server].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::BOT_ADMIN && hasRole(member, m_client->m_serverBotSettings[server].botAdminRole)) || isOwner(member.user.ID)) {
+    else if ((m_client->m_serverBotSettings[arServer].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::BOT_ADMIN && hasRole(acrMember, m_client->m_serverBotSettings[arServer].botAdminRole)) || isOwner(acrMember.user.ID)) {
 		return true;
     }
-    else if (m_client->m_serverBotSettings[server].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::CMD_ALL) {
+    else if (m_client->m_serverBotSettings[arServer].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::CMD_ALL) {
     	return true;
 	}
     else {

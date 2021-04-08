@@ -19,13 +19,13 @@ struct ServerBotSettings {
 	};
 
 	ServerBotSettings();
-	bool operator==(const ServerBotSettings& rhs) const;
-	bool operator!=(const ServerBotSettings& rhs) const;
+	bool operator==(const ServerBotSettings& acrRhs) const;
+	bool operator!=(const ServerBotSettings& acrRhs) const;
 };
 
 struct ServerBotSettingsComparator {
-	bool operator()(const ServerBotSettings& lhs, const ServerBotSettings& rhs) const;
-	bool operator()(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& lhs, const SleepyDiscord::Snowflake<SleepyDiscord::Server>& rhs) const;
+	bool operator()(const ServerBotSettings& arcLhs, const ServerBotSettings& acrRhs) const;
+	bool operator()(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrLhs, const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrRhs) const;
 };
 
 #endif
