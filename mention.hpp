@@ -10,20 +10,20 @@ public:
     inline void operator=(const T& a);
     
     bool operator==(const T& a) const {
-        return a == mention;
+        return a == m_mention;
     }
 
     operator const std::string&() const {
-        return prefix + mention + ">";
+        return m_prefix + m_mention + ">";
     }
 
     std::string string() const {
-        return prefix + mention + ">";
+        return m_prefix + m_mention + ">";
     }
 
 private:
-    std::string prefix;
-    std::string mention;
+    std::string m_prefix;
+    std::string m_mention;
 };
 
 template<class T> std::string operator+ (const std::string& string, const Mention<T>& mention) {
