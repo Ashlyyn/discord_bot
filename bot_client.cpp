@@ -49,7 +49,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 }
 
 void MyClientClass::onServer(SleepyDiscord::Server aServer) {
-	
+	m_servers[SleepyDiscord::Snowflake<SleepyDiscord::Server>(aServer)] = aServer;
 }
 
 void MyClientClass::fn_changePrefix(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrNewPrefix) {
