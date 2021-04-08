@@ -52,59 +52,59 @@ void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 	
 }
 
-void MyClientClass::fn_changePrefix(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannel, const std::string& acrNewPrefix) {
+void MyClientClass::fn_changePrefix(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrNewPrefix) {
 	if(acrNewPrefix.find(" ") != std::string::npos) {
-		echo(arServer, acrUser, acrChannel, "Prefix may not contain whitespace.");
+		echo(arServerID, acrUser, acrChannelID, "Prefix may not contain whitespace.");
 	}
-	m_serverBotSettings[arServer].prefix = acrNewPrefix;
+	m_serverBotSettings[arServerID].prefix = acrNewPrefix;
 }
 
-void MyClientClass::fn_hello(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannel) {
-	echo(arServer, acrUser, acrChannel, "Hello, " + Mention<SleepyDiscord::User>(acrUser));
+void MyClientClass::fn_hello(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+	echo(arServerID, acrUser, acrChannelID, "Hello, " + Mention<SleepyDiscord::User>(acrUser));
 }
 
-void MyClientClass::fn_echo(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannel, const std::string& acrMessage) {
-	if (m_serverBotSettings[arServer].silent == false) {
-		sendMessage(acrChannel, acrMessage);
-	}
-}
-
-void MyClientClass::fn_muteVoice(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser) {
-	muteServerMember(arServer, acrUser.ID, true);
-}
-
-void MyClientClass::fn_unmuteVoice(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser) {
-	muteServerMember(arServer, acrUser.ID, false);
-}
-
-void MyClientClass::fn_muteText(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser) {
-	if(std::count(m_serverBotSettings[arServer].mutedUsers.begin(), m_serverBotSettings[arServer].mutedUsers.end(), acrUser) == 0) {
-		m_serverBotSettings[arServer].mutedUsers.push_back(acrUser);
+void MyClientClass::fn_echo(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrMessage) {
+	if (m_serverBotSettings[arServerID].silent == false) {
+		sendMessage(acrChannelID, acrMessage);
 	}
 }
 
-void MyClientClass::fn_unmuteText(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser) {
-	if(std::count(m_serverBotSettings[arServer].mutedUsers.begin(), m_serverBotSettings[arServer].mutedUsers.end(), acrUser) > 0) {
-		m_serverBotSettings[arServer].mutedUsers.erase(std::find(m_serverBotSettings[arServer].mutedUsers.begin(), m_serverBotSettings[arServer].mutedUsers.end(), acrUser));
+void MyClientClass::fn_muteVoice(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser) {
+	muteServerMember(arServerID, acrUser.ID, true);
+}
+
+void MyClientClass::fn_unmuteVoice(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser) {
+	muteServerMember(arServerID, acrUser.ID, false);
+}
+
+void MyClientClass::fn_muteText(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser) {
+	if(std::count(m_serverBotSettings[arServerID].mutedUserIDs.begin(), m_serverBotSettings[arServerID].mutedUserIDs.end(), acrUser) == 0) {
+		m_serverBotSettings[arServerID].mutedUserIDs.push_back(acrUser);
 	}
 }
 
-void MyClientClass::fn_setBotAdminRole(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRole) {
-	m_serverBotSettings[arServer].botAdminRole = acrRole;
-	logAction(arServer, acrUser, "**BOT ADMIN ROLE SET**\n```Set to: " + acrRole.string() + "\nSet by: " + acrUser.username + "#" + acrUser.discriminator + "\n```");
+void MyClientClass::fn_unmuteText(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser) {
+	if(std::count(m_serverBotSettings[arServerID].mutedUserIDs.begin(), m_serverBotSettings[arServerID].mutedUserIDs.end(), acrUser) > 0) {
+		m_serverBotSettings[arServerID].mutedUserIDs.erase(std::find(m_serverBotSettings[arServerID].mutedUserIDs.begin(), m_serverBotSettings[arServerID].mutedUserIDs.end(), acrUser));
+	}
 }
 
-void MyClientClass::fn_setLogsChannel(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannel) {
-	m_serverBotSettings[arServer].logsChannel = acrChannel;
-	logAction(arServer, acrUser, "Logs enabled in " + Mention<SleepyDiscord::Snowflake<SleepyDiscord::Channel>>(acrChannel));
+void MyClientClass::fn_setBotAdminRole(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
+	m_serverBotSettings[arServerID].botAdminRoleID = acrRoleID;
+	logAction(arServerID, acrUser, "**BOT ADMIN ROLE SET**\n```Set to: " + acrRoleID.string() + "\nSet by: " + acrUser.username + "#" + acrUser.discriminator + "\n```");
 }
 
-void MyClientClass::fn_logsDisable(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, bool b) {
-	m_serverBotSettings[arServer].noLogs = b;
+void MyClientClass::fn_setLogsChannel(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+	m_serverBotSettings[arServerID].logsChannelID = acrChannelID;
+	logAction(arServerID, acrUser, "Logs enabled in " + Mention<SleepyDiscord::Snowflake<SleepyDiscord::Channel>>(acrChannelID));
 }
 
-void MyClientClass::fn_setSilent(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, bool b) {
-	m_serverBotSettings[arServer].silent = b;
+void MyClientClass::fn_logsDisable(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, bool b) {
+	m_serverBotSettings[arServerID].noLogs = b;
+}
+
+void MyClientClass::fn_setSilent(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, bool b) {
+	m_serverBotSettings[arServerID].silent = b;
 }
 
 void MyClientClass::fn_deleteMsg(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, SleepyDiscord::Message& arMessage) {
@@ -115,8 +115,8 @@ void MyClientClass::fn_deleteMsg(SleepyDiscord::Snowflake<SleepyDiscord::Server>
 
 void MyClientClass::fn_logAction(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, const std::string& acrString) {
 	if (m_serverBotSettings[arServer].noLogs == false) {
-		if (m_serverBotSettings[arServer].logsChannel != SleepyDiscord::Snowflake<SleepyDiscord::Channel>()) {
-			echo(arServer, acrUser, m_serverBotSettings[arServer].logsChannel, acrString);
+		if (m_serverBotSettings[arServer].logsChannelID != SleepyDiscord::Snowflake<SleepyDiscord::Channel>()) {
+			echo(arServer, acrUser, m_serverBotSettings[arServer].logsChannelID, acrString);
 		}
 	}
 }
@@ -203,7 +203,7 @@ MyClientClass::COMMAND_TYPE MyClientClass::toCommandType(const std::string& acrS
 }
 
 bool MyClientClass::isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServer, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUser) {
-	if(std::count(m_serverBotSettings[acrServer].mutedUsers.begin(), m_serverBotSettings[acrServer].mutedUsers.end(), acrUser) >= 1) {
+	if(std::count(m_serverBotSettings[acrServer].mutedUserIDs.begin(), m_serverBotSettings[acrServer].mutedUserIDs.end(), acrUser) >= 1) {
 		return true;
 	} else {
 		return false;

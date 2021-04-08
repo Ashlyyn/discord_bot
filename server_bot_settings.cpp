@@ -3,16 +3,16 @@
 #include "server_bot_settings.hpp"
 
 ServerBotSettings::ServerBotSettings() {
-	logsChannel = SleepyDiscord::Snowflake<SleepyDiscord::Channel>();
-	botAdminRole = SleepyDiscord::Snowflake<SleepyDiscord::Role>();
+	logsChannelID = SleepyDiscord::Snowflake<SleepyDiscord::Channel>();
+	botAdminRoleID = SleepyDiscord::Snowflake<SleepyDiscord::Role>();
 	//mutedUsers = std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> >();
 	permissions = {2, 2};
 }
 
 bool ServerBotSettings::operator==(const ServerBotSettings& acrRhs) const {
 	if((silent == acrRhs.silent) && (noLogs == acrRhs.noLogs) && (prefix == acrRhs.prefix) 
-		&& (logsChannel == acrRhs.logsChannel) && (botAdminRole == acrRhs.botAdminRole)
-		&& (mutedUsers == acrRhs.mutedUsers) && (permissions == acrRhs.permissions)
+		&& (logsChannelID == acrRhs.logsChannelID) && (botAdminRoleID == acrRhs.botAdminRoleID)
+		&& (mutedUserIDs == acrRhs.mutedUserIDs) && (permissions == acrRhs.permissions)
 	) {
 	    return true;
 	}

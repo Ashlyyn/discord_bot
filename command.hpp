@@ -42,9 +42,9 @@ public:
 
     }
 
-    template<typename ...Args> void operator()(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServer, const SleepyDiscord::User& acrUser, Args... args) {
-        if(checkPermissions(arServer, acrUser) == true) {
-            (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServer, acrUser, args...);
+    template<typename ...Args> void operator()(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, Args... args) {
+        if(checkPermissions(arServerID, acrUser) == true) {
+            (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServerID, acrUser, args...);
         }
     }
 
@@ -57,9 +57,9 @@ private:
 
     std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, COMMAND_TYPE, ServerBotSettingsComparator> m_permissions;
 
-    static bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUser);
-    static bool hasRole(SleepyDiscord::Server& arServer, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRole);
-    bool checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServer, const SleepyDiscord::User& acrUser) const;
+    static bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);
+    static bool hasRole(SleepyDiscord::Server& arServer, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID);
+    bool checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser) const;
 };
 
 
