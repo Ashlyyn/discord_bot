@@ -66,6 +66,26 @@ template<> Mention<SleepyDiscord::Role>::Mention(const SleepyDiscord::Snowflake<
     mention = snowflake;
 }
 
+template<> Mention<SleepyDiscord::Snowflake<SleepyDiscord::User>>::Mention(const SleepyDiscord::Snowflake<SleepyDiscord::User>& snowflake) {
+    prefix = "<@!";
+    mention = snowflake;
+}
+
+template<> Mention<SleepyDiscord::Snowflake<SleepyDiscord::ServerMember>>::Mention(const SleepyDiscord::Snowflake<SleepyDiscord::ServerMember>& snowflake) {
+    prefix = "<@!";
+    mention = snowflake;
+}
+
+template<> Mention<SleepyDiscord::Snowflake<SleepyDiscord::Channel>>::Mention(const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& snowflake) {
+    prefix = "<#";
+    mention = snowflake;
+}
+
+template<> Mention<SleepyDiscord::Snowflake<SleepyDiscord::Role>>::Mention(const SleepyDiscord::Snowflake<SleepyDiscord::Role>& snowflake) {
+    prefix = "<@&";
+    mention = snowflake;
+}
+
 template<> void Mention<SleepyDiscord::User>::operator=(const SleepyDiscord::User& user) {
     SleepyDiscord::Snowflake<SleepyDiscord::User> snowflake = user;
     prefix = "<@!";

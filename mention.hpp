@@ -6,6 +6,7 @@ public:
     Mention(const std::string& snowflake);
     Mention(const T& type);
     Mention(const SleepyDiscord::Snowflake<T>& snowflake);
+    
     inline void operator=(const T& a);
     
     bool operator==(const T& a) const {
