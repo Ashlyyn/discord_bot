@@ -1,25 +1,26 @@
 Discord bot created in C++ with Sleepy Discord.
 
 Variable Naming Convention:
-Class members prefixed with "m\_", excepting objects with an overloaded operator=() intended to be used like a function call
 
-Static variables prefixed with "s\_"
+Class members are to be prefixed with "m\_", excepting objects with an overloaded operator=() intended to be used like a function call
 
-Global variables prefixed with "g\_"
+Static variables are to be prefixed with "s\_"
 
-Function arguments prefixed with 'a'
+Global variables are to be prefixed with "g\_"
 
-Local variables prefixed with 'l'
+Function arguments are to be prefixed with 'a'
 
-Const variables prefixed with 'c'
+Local variables are to be prefixed with 'l'
 
-Pointers prefixed with 'p'
+Const variables are to be prefixed with 'c'
 
-Double pointers prefixed with "pp"
+Pointers are to be prefixed with 'p'
 
-Function pointers prefixed with "fp"
+Double pointers are to be prefixed with "pp"
 
-References prefixed with 'r'
+Function pointers are to be prefixed with "fp"
+
+References are to be prefixed with 'r'
 
 Precedence follows the order listed above (i.e. [m\_|s\_|g\_][a|l][c][p|fp][r]
 
