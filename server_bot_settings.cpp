@@ -4,14 +4,15 @@
 
 ServerBotSettings::ServerBotSettings() {
 	logsChannel = SleepyDiscord::Snowflake<SleepyDiscord::Channel>();
-	SleepyDiscord::Snowflake<SleepyDiscord::Role>();
-	std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> >();
+	botAdminRole = SleepyDiscord::Snowflake<SleepyDiscord::Role>();
+	//mutedUsers = std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> >();
+	permissions = {2, 2};
 }
 
-bool ServerBotSettings::operator==(const ServerBotSettings& rhs) const {
-	if((silent == rhs.silent) && (noLogs == rhs.noLogs) && (prefix == rhs.prefix) 
-		&& (logsChannel == rhs.logsChannel) && (botAdminRole == rhs.botAdminRole)
-		&& (mutedUsers == rhs.mutedUsers) && (permissions == rhs.permissions)
+bool ServerBotSettings::operator==(const ServerBotSettings& acrRhs) const {
+	if((silent == acrRhs.silent) && (noLogs == acrRhs.noLogs) && (prefix == acrRhs.prefix) 
+		&& (logsChannel == acrRhs.logsChannel) && (botAdminRole == acrRhs.botAdminRole)
+		&& (mutedUsers == acrRhs.mutedUsers) && (permissions == acrRhs.permissions)
 	) {
 	    return true;
 	}
@@ -20,8 +21,8 @@ bool ServerBotSettings::operator==(const ServerBotSettings& rhs) const {
 	}
 }
 
-bool ServerBotSettings::operator!=(const ServerBotSettings& rhs) const {
-	if(!operator==(rhs)) {
+bool ServerBotSettings::operator!=(const ServerBotSettings& acrRhs) const {
+	if(!operator==(acrRhs)) {
 		return true;
 	}
 	else {
@@ -29,8 +30,8 @@ bool ServerBotSettings::operator!=(const ServerBotSettings& rhs) const {
 	}
 }
 
-bool ServerBotSettingsComparator::operator()(const ServerBotSettings& lhs, const ServerBotSettings& rhs) const {
-	if(lhs == ServerBotSettings() && rhs != ServerBotSettings()) {
+bool ServerBotSettingsComparator::operator()(const ServerBotSettings& acrLhs, const ServerBotSettings& acrRhs) const {
+	if(acrRhs == ServerBotSettings() && acrRhs != ServerBotSettings()) {
 		return 0;
 	}
 	else {
@@ -38,8 +39,8 @@ bool ServerBotSettingsComparator::operator()(const ServerBotSettings& lhs, const
 	}
 }
 
-bool ServerBotSettingsComparator::operator()(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& lhs, const SleepyDiscord::Snowflake<SleepyDiscord::Server>& rhs) const {
-	if(lhs == SleepyDiscord::Snowflake<SleepyDiscord::Server>() && rhs != SleepyDiscord::Snowflake<SleepyDiscord::Server>()) {
+bool ServerBotSettingsComparator::operator()(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrLhs, const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrRhs) const {
+	if(acrLhs == SleepyDiscord::Snowflake<SleepyDiscord::Server>() && acrRhs != SleepyDiscord::Snowflake<SleepyDiscord::Server>()) {
 		return 0;
 	}
 	else {
