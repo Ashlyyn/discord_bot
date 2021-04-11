@@ -43,8 +43,17 @@ public:
     }
 
     template<typename ...Args> void operator()(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, Args... args) {
-        if(checkPermissions(arServerID, acrUser) == true) {
-            (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServerID, acrUser, args...);
+        if(arServerID == SleepyDiscord::Snowflake<SleepyDiscord::Server>()) {
+            throw std::runtime_error("Command::operator(): Null server passed to function.");
+        }
+        else if (acrUser == SleepyDiscord::User()) {
+            throw std::runtime_error("Command::operator(): Null user passed to function.");
+        }
+        
+        else {
+            if(checkPermissions(arServerID, acrUser) == true) {
+                (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServerID, acrUser, args...);
+           }
         }
     }
 
