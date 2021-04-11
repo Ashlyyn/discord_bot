@@ -21,6 +21,8 @@ public:
 	Command unmuteVoice		= Command("unmute voice", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unmuteVoice);
 	Command muteText		= Command("mute text", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_muteText);
 	Command unmuteText		= Command("unmute text", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unmuteText);
+	Command kick			= Command("kick", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_kick);
+	Command ban				= Command("ban", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_ban);
 	Command setBotAdminRole = Command("bot_admin_role set", this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_setBotAdminRole);
 	Command logsDisable		= Command("logs disable", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_logsDisable);
 	Command logsEnable		= Command("logs enable", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_logsDisable);
@@ -48,8 +50,8 @@ public:
 		ROLE_ALL
 	};
 
-	std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, SleepyDiscord::Server, ServerBotSettingsComparator> m_servers;
-	std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, ServerBotSettings, ServerBotSettingsComparator> m_serverBotSettings;
+	std::unordered_map<std::string, SleepyDiscord::Server> m_servers;
+	std::unordered_map<std::string, ServerBotSettings> m_serverBotSettings;
 
 protected:
 	void fn_changePrefix	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrNewPrefix);
@@ -59,6 +61,8 @@ protected:
 	void fn_unmuteVoice		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser);
 	void fn_muteText		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser);
 	void fn_unmuteText		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser);
+	void fn_kick			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrKickedUserID, const std::string& acrReason = "");
+	void fn_ban				(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrBannedUserID, const std::string& acrReason = "", int acDeleteMessageDays = 36500);
 	void fn_setBotAdminRole	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID);
 	void fn_setLogsChannel	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
 	void fn_logsDisable		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, bool b = true);
@@ -70,11 +74,11 @@ protected:
 	void fn_bannedOps		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
 
 private:
-	static std::vector<std::string> split(const std::string& acrString);
-	static std::string getSnowflake(const std::string& acrString);
-	static COMMAND_TYPE toCommandType(const std::string& acrString);
-	static COMMAND_PERMISSION toCommandPerm(const std::string& acrString);
-	bool isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);
+	static std::vector<std::string> split	(const std::string& acrString);
+	static std::string getSnowflake			(const std::string& acrString);
+	static COMMAND_TYPE toCommandType		(const std::string& acrString);
+	static COMMAND_PERMISSION toCommandPerm	(const std::string& acrString);
+		   bool isMuted						(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);
 };
 
 #endif
