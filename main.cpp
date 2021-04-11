@@ -2,7 +2,7 @@
 #include "bot_client.hpp"
 
 int main() {
-	MyClientClass client("NzgzMTc3ODExOTUwOTYwNjcw.X8W9LQ.E3Kusm_bV5g8KbDzTymcQjobPVM", SleepyDiscord::USER_CONTROLED_THREADS);
+	MyClientClass client("NzgzMTc3ODExOTUwOTYwNjcw.X8W9LQ.Vo5Fs4L-081B3ENZ337arDewGtE", SleepyDiscord::USER_CONTROLED_THREADS);
 	try{
 		client.run();
 	} catch(std::runtime_error& e) {
