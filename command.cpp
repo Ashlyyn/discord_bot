@@ -23,13 +23,13 @@ bool Command::hasRole(SleepyDiscord::Server& arServer, const SleepyDiscord::Snow
 }
 
 bool Command::checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser) const {
-	if(m_client->m_serverBotSettings[acrServerID].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::OWNER_ONLY && isOwner(acrUser.ID)) {
+	if(m_client->m_serverBotSettings.at(acrServerID).permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::OWNER_ONLY && isOwner(acrUser.ID)) {
     	return true;
 	} 
-    else if (((m_client->m_serverBotSettings[acrServerID].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::BOT_ADMIN) && (hasRole(m_client->m_servers.at(acrServerID), acrUser, m_client->m_serverBotSettings[acrServerID].botAdminRoleID))) || isOwner(acrUser.ID)) {
+    else if (((m_client->m_serverBotSettings.at(acrServerID).permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::BOT_ADMIN) && (hasRole(m_client->m_servers.at(acrServerID), acrUser, m_client->m_serverBotSettings.at(acrServerID).botAdminRoleID))) || isOwner(acrUser.ID)) {
 		return true;
     }
-    else if (m_client->m_serverBotSettings[acrServerID].permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::CMD_ALL) {
+    else if (m_client->m_serverBotSettings.at(acrServerID).permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::CMD_ALL) {
     	return true;
 	}
     else {

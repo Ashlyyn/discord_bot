@@ -9,6 +9,8 @@
 
 #include "server_bot_settings.hpp"
 
+#define ASIO_NO_EXCEPTIONS
+
 class MyClientClass;
 
 class Command {
@@ -51,9 +53,9 @@ public:
         }
         
         else {
-            if(checkPermissions(arServerID, acrUser) == true) {
+            //if(checkPermissions(arServerID, acrUser) == true) {
                 (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServerID, acrUser, args...);
-           }
+            //}
         }
     }
 
