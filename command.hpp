@@ -27,21 +27,23 @@ public:
 		ROLE_ALL
 	};
 
+    std::string name;
+
     Command() {
-        m_name = std::string();
+        name = std::string();
         m_client = nullptr;
         m_fpRun = nullptr;
         m_commandType = COMMAND_TYPE::NON_ADMIN;
         m_numParams = -1;
     }
 
-    template<typename ...Args> Command(const std::string& acrName, MyClientClass* apClient, COMMAND_TYPE aCommandType, void(MyClientClass::*fpFnptr)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...)) {
-        m_name = acrName;
+    template<typename ...Args> Command(const std::string& acrName, MyClientClass* apClient, COMMAND_TYPE aCommandType, void(MyClientClass::*fpFnptr)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...), bool b = false) {
+        name = acrName;
         m_client = apClient;
         m_fpRun = (void(MyClientClass::*)()) fpFnptr;
         m_commandType = aCommandType;
+        m_noOwner = b;
         m_numParams = sizeof...(Args);
-
     }
 
     template<typename ...Args> void operator()(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, Args... args) {
@@ -53,18 +55,20 @@ public:
         }
         
         else {
-            //if(checkPermissions(arServerID, acrUser) == true) {
-                (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServerID, acrUser, args...);
+            //if(((m_noOwner == true) && (isOwner(acrUser.ID))) || (m_noOwner == false)) {
+                if((checkPermissions(arServerID, acrUser) == true) || (name == "log_action")) {
+                    (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServerID, acrUser, args...);
+                }
             //}
         }
     }
 
 private:
-    std::string m_name;
     MyClientClass* m_client;
     void (MyClientClass::*m_fpRun)();
     COMMAND_TYPE m_commandType;
     int m_numParams;
+    bool m_noOwner;
 
     std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, COMMAND_TYPE, ServerBotSettingsComparator> m_permissions;
 
