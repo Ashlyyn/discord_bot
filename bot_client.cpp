@@ -103,12 +103,12 @@ void MyClientClass::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Serve
 	std::time_t lTime = std::time(nullptr);
 	std::put_time(std::gmtime(&lTime), "%c");
 	std::stringstream lTimeSS;
-	lTimeSS >> lTime;
+	lTimeSS << lTime;
 	const std::string lcTimeStr = lTimeSS.str();
 	std::string lLog;
 	
 	m_servers.at(aServerID).members.erase(m_servers.at(aServerID).findMember(aRemovedUser.ID));
-	// if user was banned, but not manually kicked
+	// if user was banned, but not kicked by bot
 	if((m_bannedUsers.find(aRemovedUser.ID) != m_bannedUsers.end()) && (m_kickedUsers.find(aRemovedUser.ID) == m_kickedUsers.end())) {
 		lLog = "**BANNED USER**\n```User: " + aRemovedUser.username + "#" + aRemovedUser.discriminator + "\nBanned by: Unknown\nReason given:\nOn: " + lcTimeStr +"```";
 		logAction(aServerID, aRemovedUser, lLog);
@@ -116,7 +116,7 @@ void MyClientClass::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Serve
 		m_kickedUsers.erase(m_kickedUsers.find(aRemovedUser.ID));
 	}
 	// else if user was manually kicked, but not banned
-	else if((m_bannedUsers.find(aRemovedUser.ID) != m_bannedUsers.end()) && (m_kickedUsers.find(aRemovedUser.ID) != m_kickedUsers.end())) {
+	else if((m_bannedUsers.find(aRemovedUser.ID) == m_bannedUsers.end()) && (m_kickedUsers.find(aRemovedUser.ID) != m_kickedUsers.end())) {
 		lLog = "**KICKED USER**\n```User: " + aRemovedUser.username + "#" + aRemovedUser.discriminator + "\nBanned by: Unknown\nReason given:\nOn: " + lcTimeStr +"```";
 		logAction(aServerID, aRemovedUser, lLog);
 		// dont't erase from m_bannedUsers, since kick should not override ban
@@ -185,10 +185,10 @@ void MyClientClass::fn_kick(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arS
 	m_kickedUsers[acrKickedUserID] = std::make_pair(lKickedUser, true);
 	kickMember(arServerID, lKickedUser);
 	std::string lLog;
-	std::time_t lTime;
+	std::time_t lTime = std::time(nullptr);
 	std::put_time(std::gmtime(&lTime), "%c");
 	std::stringstream lTimeSS;
-	lTimeSS >> lTime;
+	lTimeSS << lTime;
 	const std::string lcTimeStr = lTimeSS.str();
 	if(acrReason == "") {
 		lLog = std::string("**KICKED USER**\n```User: " + lKickedUser.username + "#" + lKickedUser.discriminator + "\nBanned by: " + acrUser.username + "#" + acrUser.discriminator + "\nReason given:\nOn: " + lcTimeStr + "```");
@@ -205,10 +205,10 @@ void MyClientClass::fn_ban(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arSe
 	m_bannedUsers[acrBannedUserID] = std::make_pair(lBannedUser, true);
 	banMember(arServerID, lBannedUser, acDeleteMessageDays, acrReason);
 	std::string lLog;
-	std::time_t lTime;
+	std::time_t lTime = std::time(nullptr);
 	std::put_time(std::gmtime(&lTime), "%c");
 	std::stringstream lTimeSS;
-	lTimeSS >> lTime;
+	lTimeSS << lTime;
 	const std::string lcTimeStr = lTimeSS.str();
 	if(acrReason == "") {
 		lLog = std::string("**BANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nBanned by: " + acrUser.username + "#" + acrUser.discriminator + "\nReason given:\nOn: " + lcTimeStr + "```");
@@ -238,10 +238,10 @@ void MyClientClass::fn_unban(SleepyDiscord::Snowflake<SleepyDiscord::Server>& ar
 		m_bannedUsers.erase(acrBannedUserID);
 		unbanMember(arServerID, acrBannedUserID);
 		std::string lLog;
-		std::time_t lTime;
+		std::time_t lTime = std::time(nullptr);
 		std::put_time(std::gmtime(&lTime), "%c");
 		std::stringstream lTimeSS;
-		lTimeSS >> lTime;
+		lTimeSS << lTime;
 		const std::string lcTimeStr = lTimeSS.str();
 		if(acrReason == "") {
 			lLog = std::string("**UNBANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nUnbanned by: " + acrUser.username + "#" + acrUser.discriminator + "\nReason given:\nOn: " + lcTimeStr + "```");
@@ -255,7 +255,7 @@ void MyClientClass::fn_unban(SleepyDiscord::Snowflake<SleepyDiscord::Server>& ar
 void MyClientClass::fn_invite(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrInvitedUserID) {
 	SleepyDiscord::Invite invite = createChannelInvite(acrChannelID, 0, 1, false, false);
 	const std::string lcInviteCode = invite.code;
-	dmUser(arServerID, acrUser, acrInvitedUserID, "discord.gg/" + lcInviteCode);
+	dmUser(arServerID, acrUser, acrInvitedUserID, "https://discord.gg/" + lcInviteCode);
 }
 
 void MyClientClass::fn_setBotAdminRole(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
