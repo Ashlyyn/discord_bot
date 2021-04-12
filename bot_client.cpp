@@ -9,6 +9,9 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		hello(aMessage.serverID, aMessage.author, aMessage.channelID);
 	} else if (aMessage.startsWith(lcrPrefix + "echo ")) {
 		echo(aMessage.serverID, aMessage.author, aMessage.channelID, aMessage.content.substr(lcrPrefix.size() + strlen("echo ")));
+	} else if (aMessage.startsWith(lcrPrefix + "user dm ")) {
+		auto words = split(aMessage.content);
+		dmUser(aMessage.serverID, aMessage.author, getSnowflake(words[2]), aMessage.content.substr(lcrPrefix.size() + strlen("user dm ") + words[2].size() + 1));
 	} else if (aMessage.startsWith(lcrPrefix + "mute voice ")) {
 		muteVoice(aMessage.serverID, aMessage.author, aMessage.content.substr(lcrPrefix.size() + strlen("mute voice ")));
 	} else if (aMessage.startsWith(lcrPrefix + "unmute voice ")) {
@@ -33,6 +36,16 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		} else {
 			ban(aMessage.serverID, aMessage.author, getSnowflake(words[1]), aMessage.content.substr(lcrPrefix.size() + strlen("ban ") + words[1].size() + 1 + words[2].size() + 1), words[2]);
 		}
+	} else if (aMessage.startsWith(lcrPrefix + "unban ")) {
+		auto words = split(aMessage.content);
+		if(words.size() == 2) {
+			unban(aMessage.serverID, aMessage.author, aMessage.channelID, words[1], "");
+		} else {
+			unban(aMessage.serverID, aMessage.author, aMessage.channelID, words[1], aMessage.content.substr(lcrPrefix.size() + strlen("unban ") + words[1].size() + 1));
+		}
+	} else if (aMessage.startsWith(lcrPrefix + "invite ")) {
+		auto words = split(aMessage.content);
+		invite(aMessage.serverID, aMessage.author, aMessage.channelID, getSnowflake(words[1]));
 	} else if (aMessage.startsWith(lcrPrefix + "bot_admin_role set ")) {
 		setBotAdminRole(aMessage.serverID, aMessage.author, getSnowflake(aMessage.content.substr(lcrPrefix.size() + strlen("bot_admin_role set "))));
 	} else if (aMessage.startsWith(lcrPrefix + "nologs")) {
@@ -90,6 +103,14 @@ void MyClientClass::fn_echo(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arS
 	}
 }
 
+void MyClientClass::fn_dmUser(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrDMedUserID, const std::string& acrMessage) {
+	if(m_userDMchannelIDs.find(acrDMedUserID) == m_userDMchannelIDs.end()) {
+		m_userDMchannelIDs[acrDMedUserID] = createDirectMessageChannel(acrDMedUserID).text;
+	}
+	const SleepyDiscord::Snowflake<SleepyDiscord::Channel> lcChannel = m_userDMchannelIDs[acrDMedUserID];
+	sendMessage(lcChannel, acrMessage);
+}
+
 void MyClientClass::fn_muteVoice(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser) {
 	muteServerMember(arServerID, acrUser.ID, true);
 }
@@ -132,6 +153,38 @@ void MyClientClass::fn_ban(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arSe
 		lLog = std::string("**BANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nBanned by: " + acrUser.username + "#" + acrUser.discriminator + "\nReason given: " + acrReason + "```");
 	}
 	logAction(arServerID, acrUser, lLog);
+}
+
+void MyClientClass::fn_unban(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrBannedUserID, const std::string& acrReason) {
+	auto lBannedUsers = getBans(arServerID).vector();
+	SleepyDiscord::User lBannedUser;
+
+	for(const auto& lUser : lBannedUsers) {
+		if(lBannedUser.ID == acrBannedUserID) {
+			lBannedUser = lUser;
+		}
+	}
+
+	if(lBannedUser.ID == "") {
+		const std::string lcLog = "User not found.";
+		echo(arServerID, acrUser, acrChannelID, lcLog);
+		return;
+	} else {
+		unbanMember(arServerID, acrBannedUserID);
+		std::string lLog;
+		if(acrReason == "") {
+			lLog = std::string("**UNBANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nUnbanned by: " + acrUser.username + "#" + acrUser.discriminator + "\nReason given:\n```");
+		} else {
+			lLog = std::string("**UNBANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nUnbanned by: " + acrUser.username + "#" + acrUser.discriminator + "\nReason given: " + acrReason + "```");
+		}
+		logAction(arServerID, acrUser, lLog);
+	}
+}
+
+void MyClientClass::fn_invite(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrInvitedUserID) {
+	SleepyDiscord::Invite invite = createChannelInvite(acrChannelID, 0, 1, false, false);
+	const std::string lcInviteCode = invite.code;
+	dmUser(arServerID, acrUser, acrInvitedUserID, "discord.gg/" + lcInviteCode);
 }
 
 void MyClientClass::fn_setBotAdminRole(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
