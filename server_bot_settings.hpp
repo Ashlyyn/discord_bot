@@ -8,17 +8,17 @@
 #include "sleepy_discord/sleepy_discord.h"
 
 struct ServerBotSettings {
-    bool silent = false;
-    bool noLogs = false;
+    bool silent = false; // don't send any messages
+    bool noLogs = false; // don't log anything
 	std::string prefix = "F!";
-	SleepyDiscord::Snowflake<SleepyDiscord::Channel> logsChannelID;
-	SleepyDiscord::Snowflake<SleepyDiscord::Role> botAdminRoleID;
-	std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User>> mutedUserIDs;
-    std::array<int, 2> permissions = {
+	SleepyDiscord::Snowflake<SleepyDiscord::Channel> logsChannelID; // channel for logs - set with setLogsChannel()/F!logs <channelID>
+	SleepyDiscord::Snowflake<SleepyDiscord::Role> botAdminRoleID; // ID of role that allows user to execute admin commands
+	std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User>> mutedUserIDs; // IDs of users text muted
+    std::array<int, 2> permissions = { // permissions for admin and non-admin commands
 		2, 2
 	};
 
-	ServerBotSettings();
+	ServerBotSettings(); // base constructor
 	bool operator==(const ServerBotSettings& acrRhs) const;
 	bool operator!=(const ServerBotSettings& acrRhs) const;
 };

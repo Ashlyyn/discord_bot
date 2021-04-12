@@ -3,9 +3,9 @@
 #include "server_bot_settings.hpp"
 
 ServerBotSettings::ServerBotSettings() {
+	// initialize variables
 	logsChannelID = SleepyDiscord::Snowflake<SleepyDiscord::Channel>();
 	botAdminRoleID = SleepyDiscord::Snowflake<SleepyDiscord::Role>();
-	//mutedUsers = std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User> >();
 	permissions = {2, 2};
 }
 

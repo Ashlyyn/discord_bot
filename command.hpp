@@ -16,9 +16,9 @@ class MyClientClass;
 class Command {
 public:
     enum COMMAND_PERMISSION {
-		OWNER_ONLY,
-		BOT_ADMIN,
-		CMD_ALL
+		OWNER_ONLY, // only owner can execute
+		BOT_ADMIN,  // only users with admin role can execute
+		CMD_ALL     // everyone can execute
 	};
 
 	enum COMMAND_TYPE {
@@ -27,8 +27,9 @@ public:
 		ROLE_ALL
 	};
 
-    std::string name;
+    std::string name; // name of command as used by bot
 
+    // set members to defaults
     Command() {
         name = std::string();
         m_client = nullptr;
@@ -37,10 +38,11 @@ public:
         m_numParams = -1;
     }
 
+    
     template<typename ...Args> Command(const std::string& acrName, MyClientClass* apClient, COMMAND_TYPE aCommandType, void(MyClientClass::*fpFnptr)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...), bool b = false) {
         name = acrName;
         m_client = apClient;
-        m_fpRun = (void(MyClientClass::*)()) fpFnptr;
+        m_fpRun = (void(MyClientClass::*)(void)) fpFnptr; // cast to void(*)(void) to allow assignment to m_fpRun
         m_commandType = aCommandType;
         m_noOwner = b;
         m_numParams = sizeof...(Args);
@@ -56,7 +58,10 @@ public:
         
         else {
             //if(((m_noOwner == true) && (isOwner(acrUser.ID))) || (m_noOwner == false)) {
+                // check if user is allowed to execute command; logAction() is excepted, since no user will ever call it
                 if((checkPermissions(arServerID, acrUser) == true) || (name == "log_action")) {
+                    // server and user must be passed to all functions, even those that do not use them directly
+                    // to allow for permission checking
                     (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServerID, acrUser, args...);
                 }
             //}
@@ -68,8 +73,9 @@ private:
     void (MyClientClass::*m_fpRun)();
     COMMAND_TYPE m_commandType;
     int m_numParams;
-    bool m_noOwner;
+    bool m_noOwner; // set to true if command shouldn't be able to affect owner - i.e., ban, kick, etc.
 
+    // permissions for each server
     std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, COMMAND_TYPE, ServerBotSettingsComparator> m_permissions;
 
     static bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);

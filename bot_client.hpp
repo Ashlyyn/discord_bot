@@ -14,6 +14,7 @@ class MyClientClass : public SleepyDiscord::DiscordClient {
 public:
 	using SleepyDiscord::DiscordClient::DiscordClient;
 
+	// command object				  name					client 	command type (admin or non-admin)	function pointer			noOwner
 	Command changePrefix 	= Command("prefix",				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_changePrefix);
 	Command hello 			= Command("hello",				this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_hello);
 	Command echo  			= Command("echo",				this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_echo);
@@ -38,6 +39,7 @@ public:
 	Command die				= Command("die",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_die);
 	Command bannedOps		= Command("banned_ops",			this, Command::COMMAND_TYPE::NON_ADMIN,	&MyClientClass::fn_bannedOps);
 
+	// client function overrides
 	void onMessage(SleepyDiscord::Message aMessage) override;
 	void onServer(SleepyDiscord::Server aServer) override;
 	void onBan(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUser) override;
@@ -55,14 +57,16 @@ public:
 		ROLE_ALL
 	};
 
-	std::unordered_map<std::string, SleepyDiscord::Server> m_servers;
+	std::unordered_map<std::string, SleepyDiscord::Server> m_servers;	// map server IDs to servers
 	std::unordered_map<std::string, SleepyDiscord::Snowflake<SleepyDiscord::Channel>> m_userDMchannelIDs;
-	std::unordered_map<std::string, ServerBotSettings> m_serverBotSettings;
-	std::unordered_map<std::string, std::pair<SleepyDiscord::User, bool>> m_bannedUsers;
-	std::unordered_map<std::string, std::pair<SleepyDiscord::User, bool>> m_kickedUsers;
-	
+	std::unordered_map<std::string, ServerBotSettings> m_serverBotSettings; // map server IDs to their respective settings struct
+	std::unordered_map<std::string, std::pair<SleepyDiscord::User, bool>> m_bannedUsers; // map server IDs to users banned from servers 
+																						 // and whether they were banned via the bot
+	std::unordered_map<std::string, std::pair<SleepyDiscord::User, bool>> m_kickedUsers; // map server IDs to users kicked from the server
+																						 // same thing with the bool
 
 protected:
+	// functions for bot - to be passed to their respective Command object; server ID and user must be passed for permissions checking even if the function does not use it directly
 	void fn_changePrefix	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrNewPrefix);
 	void fn_hello			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
 	void fn_echo			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrMessage);
@@ -87,10 +91,10 @@ protected:
 
 private:
 	const SleepyDiscord::Snowflake<SleepyDiscord::User> ownerID = 518216114665291786;
-	static std::vector<std::string> split	(const std::string& acrString);
-	static std::string getSnowflake			(const std::string& acrString);
-	static COMMAND_TYPE toCommandType		(const std::string& acrString);
-	static COMMAND_PERMISSION toCommandPerm	(const std::string& acrString);
+	static std::vector<std::string> split	(const std::string& acrString); // split string into vector of words
+	static std::string getSnowflake			(const std::string& acrString); // get ID from mention
+	static COMMAND_TYPE toCommandType		(const std::string& acrString); // map string to command type
+	static COMMAND_PERMISSION toCommandPerm	(const std::string& acrString); // map string to command perm
 		   bool isMuted						(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);
 };
 

@@ -2,6 +2,8 @@
 
 #include "mention.hpp"
 
+// templates specialized since user, channel, and role all have a different prefix
+
 template<> Mention<SleepyDiscord::User>::Mention(const std::string& snowflake) {
     m_prefix = "<@!";
     m_mention = snowflake;
