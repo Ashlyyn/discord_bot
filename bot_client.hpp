@@ -17,13 +17,13 @@ public:
 	Command changePrefix 	= Command("prefix",				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_changePrefix);
 	Command hello 			= Command("hello",				this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_hello);
 	Command echo  			= Command("echo",				this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_echo);
-	Command dmUser  		= Command("user dm",			this, Command::COMMAND_TYPE::ADMIN, 	&MyClientClass::fn_dmUser);
-	Command muteVoice		= Command("mute voice", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_muteVoice);
-	Command unmuteVoice		= Command("unmute voice", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unmuteVoice);
-	Command muteText		= Command("mute text", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_muteText);
-	Command unmuteText		= Command("unmute text", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unmuteText);
-	Command kick			= Command("kick", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_kick);
-	Command ban				= Command("ban", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_ban);
+	Command dmUser  		= Command("dm",					this, Command::COMMAND_TYPE::ADMIN, 	&MyClientClass::fn_dmUser);
+	Command muteVoice		= Command("mute voice", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_muteVoice,	true);
+	Command unmuteVoice		= Command("unmute voice", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unmuteVoice,	true);
+	Command muteText		= Command("mute text", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_muteText,	true);
+	Command unmuteText		= Command("unmute text", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unmuteText,	true);
+	Command kick			= Command("kick", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_kick,		true);
+	Command ban				= Command("ban", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_ban,			true);
 	Command unban			= Command("unban", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unban);
 	Command invite			= Command("invite", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_invite);
 	Command setBotAdminRole = Command("bot_admin_role set", this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_setBotAdminRole);
@@ -40,6 +40,8 @@ public:
 
 	void onMessage(SleepyDiscord::Message aMessage) override;
 	void onServer(SleepyDiscord::Server aServer) override;
+	void onBan(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUser) override;
+	void onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aRemovedUser) override;
 
     enum COMMAND_PERMISSION {
 		OWNER_ONLY,
@@ -56,16 +58,19 @@ public:
 	std::unordered_map<std::string, SleepyDiscord::Server> m_servers;
 	std::unordered_map<std::string, SleepyDiscord::Snowflake<SleepyDiscord::Channel>> m_userDMchannelIDs;
 	std::unordered_map<std::string, ServerBotSettings> m_serverBotSettings;
+	std::unordered_map<std::string, std::pair<SleepyDiscord::User, bool>> m_bannedUsers;
+	std::unordered_map<std::string, std::pair<SleepyDiscord::User, bool>> m_kickedUsers;
+	
 
 protected:
 	void fn_changePrefix	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrNewPrefix);
 	void fn_hello			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
 	void fn_echo			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrMessage);
-	void fn_dmUser			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrDMedUserID, const std::string& acrMessage = "");
-	void fn_muteVoice		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser);
-	void fn_unmuteVoice		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser);
-	void fn_muteText		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser);
-	void fn_unmuteText		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser);
+	void fn_dmUser			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrDMedUserID, 	const std::string& acrMessage = "");
+	void fn_muteVoice		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrMutedUserID);
+	void fn_unmuteVoice		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrMutedUserID);
+	void fn_muteText		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrMutedUserID);
+	void fn_unmuteText		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrMutedUserID);
 	void fn_kick			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrKickedUserID, const std::string& acrReason = "");
 	void fn_ban				(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrBannedUserID, const std::string& acrReason = "", int acDeleteMessageDays = 36500);
 	void fn_unban			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrBannedUserID, const std::string& acrReason = "");
@@ -81,6 +86,7 @@ protected:
 	void fn_bannedOps		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
 
 private:
+	const SleepyDiscord::Snowflake<SleepyDiscord::User> ownerID = 518216114665291786;
 	static std::vector<std::string> split	(const std::string& acrString);
 	static std::string getSnowflake			(const std::string& acrString);
 	static COMMAND_TYPE toCommandType		(const std::string& acrString);
