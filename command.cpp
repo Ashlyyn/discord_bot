@@ -3,8 +3,8 @@
 
 #include "sleepy_discord/sleepy_discord.h"
 
-bool Command::isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
-	if (acrUserID == 518216114665291786) { // 518216114665291786 is owner ID
+bool Command::isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) const {
+	if (acrUserID == m_client->ownerID) {
 		return true;
 	}
 	else {

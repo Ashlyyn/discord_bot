@@ -78,7 +78,7 @@ private:
     // permissions for each server
     std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, COMMAND_TYPE, ServerBotSettingsComparator> m_permissions;
 
-    static bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);
+    bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) const;
     static bool hasRole(SleepyDiscord::Server& arServer, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID);
     bool checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser) const;
 };
