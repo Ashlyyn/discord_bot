@@ -73,7 +73,14 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 	} else if (aMessage.startsWith(lcrPrefix + "banned_ops")) {
 		bannedOps(aMessage.serverID, aMessage.author, aMessage.channelID);
 	} else if (aMessage.startsWith(lcrPrefix + "sonar_ping")) {
-		sonarPing(aMessage.serverID, aMessage.author, aMessage.channelID, getSnowflake(split(aMessage.content)[1]), stoi(split(aMessage.content)[2]));
+		int lNumPings;
+		try {
+			lNumPings = stoi(split(aMessage.content)[2]);
+		} catch(const std::out_of_range& e) {
+			std::fprintf(stderr, "onMessage(): sonar_ping provided out of range value.\n");
+			lNumPings = 0;
+		}
+		sonarPing(aMessage.serverID, aMessage.author, aMessage.channelID, getSnowflake(split(aMessage.content)[1]), lNumPings);
 	}
 
 	else if(aMessage.startsWith(lcrPrefix)) {
