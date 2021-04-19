@@ -35,6 +35,7 @@ public:
         m_client = nullptr;
         m_fpRun = nullptr;
         m_commandType = COMMAND_TYPE::NON_ADMIN;
+        m_noOwner = false;
         m_numParams = -1;
     }
 
@@ -65,8 +66,6 @@ public:
                     // to allow for permission checking
                     (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServerID, acrUser, args...);
                 }
-            } else {
-                m_client->echo(arServerID)
             }
         }
     }
