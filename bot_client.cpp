@@ -78,6 +78,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 			lNumPings = stoi(split(aMessage.content)[2]);
 		} catch(const std::out_of_range& e) {
 			std::fprintf(stderr, "onMessage(): sonar_ping provided out of range value.\n");
+			echo(aMessage.serverID, aMessage.author, aMessage.channelID, "Value is too large, must be less than 2^32");
 			lNumPings = 0;
 		}
 		sonarPing(aMessage.serverID, aMessage.author, aMessage.channelID, getSnowflake(split(aMessage.content)[1]), lNumPings);
@@ -95,7 +96,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 
 void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 	m_servers[aServer.ID] = aServer;
-	m_serverBotSettings[aServer.ID] = ServerBotSettings(); // add key to m_serverBotSettings and default-initialize value
+	m_serverBotSettings[aServer.ID] = ServerBotSettings(); // add server ID to m_serverBotSettings and default-initialize value object
 }
 
 void MyClientClass::onBan(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aBannedUser) {
@@ -103,8 +104,8 @@ void MyClientClass::onBan(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServe
 	std::lock_guard<std::mutex> lock(mutex);
 	
 	// if user wasn't already added to m_bannedUsers by ban()
-	if(m_bannedUsers.find(aBannedUser.ID) == m_bannedUsers.end()) {
-		// if user wasn't already added, then they weren't manually banned
+		if(m_bannedUsers.find(aBannedUser.ID) == m_bannedUsers.end()) {
+		// if user wasn't already added, then they weren't manually banned (set bool value to false)
 		m_bannedUsers[aBannedUser.ID] = std::make_pair(aBannedUser, false);
 	}
 	// client automatically calls onRemoveUser(), which handles the logging
@@ -121,26 +122,31 @@ void MyClientClass::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Serve
 	const std::string lcTimeStr = lTimeSS.str(); // hacky way to get std::string from time_t
 	std::string lLog;
 	
-	m_servers.at(aServerID).members.erase(m_servers.at(aServerID).findMember(aRemovedUser.ID));
-	// if user was banned, but not kicked by bot
+	m_servers.at(aServerID).members.erase(m_servers.at(aServerID).findMember(aRemovedUser.ID)); // remove user from cached server
+	// if user was banned, not kicked
 	if((m_bannedUsers.find(aRemovedUser.ID) != m_bannedUsers.end()) && (m_kickedUsers.find(aRemovedUser.ID) == m_kickedUsers.end())) {
-		lLog = "**BANNED USER**\n```User: " + aRemovedUser.username + "#" + aRemovedUser.discriminator + "\nBanned by: Unknown\nReason given:\nOn: " + lcTimeStr +"```";
-		logAction(aServerID, aRemovedUser, lLog);
-		// erase user if user was previously kicked, then banned
+		// if user was not banned by bot, log ban
+		// if user was banned by bot, ban will have already been logged by ban()
+		if(m_bannedUsers.at(aRemovedUser.ID).second == false) {
+			lLog = "**BANNED USER**\n```User: " + aRemovedUser.username + "#" + aRemovedUser.discriminator + "\nBanned by: Unknown\nReason given:\nOn: " + lcTimeStr +"```";
+			logAction(aServerID, aRemovedUser, lLog);
+		}
+		// erase user if user was previously kicked, and now banned
 		m_kickedUsers.erase(m_kickedUsers.find(aRemovedUser.ID));
 	}
 	// else if user was manually kicked, but not banned
 	else if((m_bannedUsers.find(aRemovedUser.ID) == m_bannedUsers.end()) && (m_kickedUsers.find(aRemovedUser.ID) != m_kickedUsers.end())) {
-		lLog = "**KICKED USER**\n```User: " + aRemovedUser.username + "#" + aRemovedUser.discriminator + "\nBanned by: Unknown\nReason given:\nOn: " + lcTimeStr +"```";
-		logAction(aServerID, aRemovedUser, lLog);
-		// dont't erase from m_bannedUsers, since kick should not override ban
+		// same as above
+		if(m_kickedUsers.at(aRemovedUser.ID).second == false) {
+			lLog = "**KICKED USER**\n```User: " + aRemovedUser.username + "#" + aRemovedUser.discriminator + "\nBanned by: Unknown\nReason given:\nOn: " + lcTimeStr +"```";
+			logAction(aServerID, aRemovedUser, lLog);
+		}
 	}
 	// else user was not manually kicked/left on their own 
 	// (can't detect difference between non-manual kick and normal leave)
 	else {
 		lLog = "**KICKED USER/USER LEFT**\n```User: " + aRemovedUser.username + "#" + aRemovedUser.discriminator + "\nOn: " + lcTimeStr +"```";
 		logAction(aServerID, aRemovedUser, lLog);
-		// dont't erase from m_bannedUsers, since kick should not override ban
 	}
 }
 
@@ -356,25 +362,13 @@ void MyClientClass::fn_sonarPing(SleepyDiscord::Snowflake<SleepyDiscord::Server>
 }
 
 
-std::vector<std::string> MyClientClass::split(const std::string& acrString) {
+std::vector<std::string> MyClientClass::split(const std::string& acrString) { // split std::string into vector of words delimited by whitespace
 	std::vector<std::string> lVec;
-	int lPos = 0;
-	while (1) {
-		int lTemp = lPos;
-		lPos = acrString.find(" ", lPos);
-		std::string lWord = acrString.substr(lTemp, lPos - lTemp);
-		if (lPos < lTemp) {
-			std::string word = acrString.substr(lTemp);
-			if (lWord.find_first_not_of(' ') != std::string::npos) {
-				lVec.push_back(word);
-			}
-			break;
-		}
+	std::string lTemp;
+    std::stringstream lSS(acrString);
 
-		if (lWord.find_first_not_of(' ') != std::string::npos) {
-			lVec.push_back(lWord);
-		}
-		lPos++;
+    while (lSS >> lTemp) {
+        lVec.push_back(lTemp);
 	}
 	return lVec;
 }
