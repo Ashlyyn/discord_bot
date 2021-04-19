@@ -93,7 +93,6 @@ protected:
 	void fn_bannedOps		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
 	void fn_sonarPing		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrPingedUserID, unsigned int aCount = 0);
 
-private:
 	static std::vector<std::string> split	(const std::string& acrString); // split string into vector of words
 	static std::string getSnowflake			(const std::string& acrString); // get ID from mention
 	static COMMAND_TYPE toCommandType		(const std::string& acrString); // map string to command type
