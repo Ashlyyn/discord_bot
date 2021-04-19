@@ -38,6 +38,7 @@ public:
 	Command setPermissions	= Command("permissions set",	this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setPermissions);
 	Command die				= Command("die",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_die);
 	Command bannedOps		= Command("banned_ops",			this, Command::COMMAND_TYPE::NON_ADMIN,	&MyClientClass::fn_bannedOps);
+	Command sonarPing		= Command("sonar_ping",			this, Command::COMMAND_TYPE::NON_ADMIN,	&MyClientClass::fn_sonarPing,	true);
 
 	// client function overrides
 	void onMessage(SleepyDiscord::Message aMessage) override;
@@ -57,6 +58,7 @@ public:
 		ROLE_ALL
 	};
 
+	const SleepyDiscord::Snowflake<SleepyDiscord::User> ownerID = 518216114665291786;
 	std::unordered_map<std::string, SleepyDiscord::Server> m_servers;	// map server IDs to servers
 	std::unordered_map<std::string, SleepyDiscord::Snowflake<SleepyDiscord::Channel>> m_userDMchannelIDs;
 	std::unordered_map<std::string, ServerBotSettings> m_serverBotSettings; // map server IDs to their respective settings struct
@@ -87,10 +89,11 @@ protected:
 	void fn_logAction		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const std::string& acrString);
 	void fn_setPermissions	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, COMMAND_PERMISSION aCommandPerm, COMMAND_TYPE aCommandType);
 	void fn_die				(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
+	
 	void fn_bannedOps		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
+	void fn_sonarPing		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrPingedUserID, unsigned int aCount = 0);
 
 private:
-	const SleepyDiscord::Snowflake<SleepyDiscord::User> ownerID = 518216114665291786;
 	static std::vector<std::string> split	(const std::string& acrString); // split string into vector of words
 	static std::string getSnowflake			(const std::string& acrString); // get ID from mention
 	static COMMAND_TYPE toCommandType		(const std::string& acrString); // map string to command type
