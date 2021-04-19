@@ -13,7 +13,7 @@ public:
         return acrRhs == m_mention;
     }
 
-    operator const std::string&() const {
+    operator const std::string() const {
         return m_prefix + m_mention + ">";
     }
 
