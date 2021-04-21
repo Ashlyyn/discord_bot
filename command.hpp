@@ -84,7 +84,7 @@ private:
     // permissions for each server
     std::unordered_map<std::string, COMMAND_TYPE> m_permissions;
 
-    bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) const;
+    static bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);
     static bool hasRole(SleepyDiscord::Server& arServer, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID);
     bool checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser) const;
 };
