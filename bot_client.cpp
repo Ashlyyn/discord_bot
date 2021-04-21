@@ -67,9 +67,82 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		deleteMsg(aMessage.serverID, aMessage.author, aMessage);
 	} else if (aMessage.startsWith(lcrPrefix + "permissions set ")) {
 		setPermissions(aMessage.serverID, aMessage.author, toCommandPerm(split(aMessage.content)[3]), toCommandType(split(aMessage.content)[2]));
-	} else if (aMessage.startsWith(lcrPrefix + "die")) {
+	} else if (aMessage.startsWith(lcrPrefix + "channel rename ")) {
+		renameChannel(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[2]), split(aMessage.content)[3]);
+	} else if (aMessage.startsWith(lcrPrefix + "channel topic set ")) {
+		setChannelTopic(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[3]), aMessage.content.substr(removeChannel.name.size() + 1 + split(aMessage.content)[3].size() + 1));
+	} else if (aMessage.startsWith(lcrPrefix + "channel delete ")) {
+		removeChannel(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[2]));
+	} else if (aMessage.startsWith(lcrPrefix + "pin ")) {
+		pin(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[1]));
+	} else if (aMessage.startsWith(lcrPrefix + "unpin ")) {
+		unpin(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[1]));
+	} else if (aMessage.startsWith(lcrPrefix + "nickname ")) {
+		changeNickname(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[1]), split(aMessage.content)[2]);
+	} else if (aMessage.startsWith(lcrPrefix + "role revoke ")) {
+		revokeRole(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[2]), getSnowflake(split(aMessage.content)[3]));
+	} else if (aMessage.startsWith(lcrPrefix + "role delete ")) {
+		rmRole(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[2]));
+	} else if (aMessage.startsWith(lcrPrefix + "prune ")) {
+		int lNumDays;
+		try {
+			lNumDays = std::stoi(split(aMessage.content)[1]);
+		} catch(std::out_of_range& e) {
+			fprintf(stderr, "onMessage(): prune provided with out of range value.\n");
+			lNumDays = 0;
+		}
+		revokeRole(aMessage.serverID, aMessage.author, lNumDays);
+	} else if (aMessage.startsWith(lcrPrefix + "invite delete ")) {
+		deleteInviteCode(aMessage.serverID, aMessage.author, split(aMessage.content)[2]);
+	} else if (aMessage.startsWith(lcrPrefix + "channel invites delete ")) {
+		deleteChannelInvites(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[2]));
+	} else if (aMessage.startsWith(lcrPrefix + "leave ")) {
+		leave(aMessage.serverID, aMessage.author);
+	} else if (aMessage.startsWith(lcrPrefix + "status ")) {
+		auto lWords = split(aMessage.content);
+		if(lWords.size() == 1) {
+			fprintf(stderr, "onMessage(): status provided with no arguments.\n");
+			return;
+		} else {
+			const std::string& lcrActivity = lWords[1];
+			SleepyDiscord::Status lStatus = SleepyDiscord::Status::online;
+			bool lbAFK = false;
+			int lIdleTime = 0;
+			if(lWords.size() > 2) {
+				std::map<std::string, SleepyDiscord::Status> lStatuses = {
+					{ "online", 		SleepyDiscord::Status::online },
+					{ "dnd", 			SleepyDiscord::Status::doNotDisturb },
+					{ "do_not_disturb", SleepyDiscord::Status::doNotDisturb },
+					{ "afk",			SleepyDiscord::Status::idle },
+					{ "idle",			SleepyDiscord::Status::idle },
+					{ "invisible",		SleepyDiscord::Status::invisible },
+					{ "offline",		SleepyDiscord::Status::offline }
+				};
+				lStatus = lStatuses.at(lWords[2]);
+			} 
+			if(lWords.size() > 3) {
+				if(lWords[3] == "1" || lWords[3] == "true") {
+					lbAFK = true;
+				} else if (lWords[3] == "0" || lWords[3] == "false") {
+					lbAFK = false;
+				} else {
+					throw std::runtime_error("onMessage(): status provided with invalid value for bool value.\n");
+				}
+			}
+			if(lWords.size() > 4) {
+				try {
+					lIdleTime = std::stoi(lWords[4]);
+				} catch(std::out_of_range& e) {
+					std::fprintf(stderr, "onMessage(): status provided with out of range value for lIdleTime.\n");
+					return;
+				}
+			}
+			status(aMessage.serverID, aMessage.author, lcrActivity, lStatus, lbAFK, lIdleTime);
+		}
+	} 
+	
+	else if (aMessage.startsWith(lcrPrefix + "die")) {
 		die(aMessage.serverID, aMessage.author, aMessage.channelID);
-
 	} else if (aMessage.startsWith(lcrPrefix + "banned_ops")) {
 		bannedOps(aMessage.serverID, aMessage.author, aMessage.channelID);
 	} else if (aMessage.startsWith(lcrPrefix + "sonar_ping")) {
@@ -82,6 +155,8 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 			lNumPings = 0;
 		}
 		sonarPing(aMessage.serverID, aMessage.author, aMessage.channelID, getSnowflake(split(aMessage.content)[1]), lNumPings);
+	} else if (aMessage.startsWith(lcrPrefix + "fuckoff")) {
+		fuckoff(aMessage.serverID, aMessage.author);
 	}
 
 	else if(aMessage.startsWith(lcrPrefix)) {
@@ -336,10 +411,80 @@ void MyClientClass::fn_setPermissions(SleepyDiscord::Snowflake<SleepyDiscord::Se
 	logAction(arServerID, acrUser, "**PERMISSIONS CHANGE:**\n```Type: " + lType[aCommandType] + "\nSet to: " + lPerms[aCommandPerm] + "\nSet by: " + acrUser.username + "#" + acrUser.discriminator + "```\n");
 }
 
+void MyClientClass::fn_setChannelName(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrName) {
+	editChannelName(acrChannelID, acrName);
+}
+
+void MyClientClass::fn_setChannelTopic	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrTopic) {
+	editChannelTopic(acrChannelID, acrTopic);
+}
+
+void MyClientClass::fn_deleteChannel(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+	deleteChannel(acrChannelID);
+}
+
+void MyClientClass::fn_pinMessage(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::Message>& acrMessageID) {
+	if(std::find(getPinnedMessages(acrChannelID).vector().begin(), getPinnedMessages(acrChannelID).vector().end(), acrMessageID) == getPinnedMessages(acrChannelID).vector().end()) {
+		pinMessage(acrChannelID, acrMessageID);
+	} else {
+		std::fprintf(stderr, "pinMessage(): message was already pinned.");
+	}
+}
+
+void MyClientClass::fn_unpinMessage(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::Message>& acrMessageID) {
+	if(std::find(getPinnedMessages(acrChannelID).vector().begin(), getPinnedMessages(acrChannelID).vector().end(), acrMessageID) != getPinnedMessages(acrChannelID).vector().end()) {
+		unpinMessage(acrChannelID, acrMessageID);
+	} else {
+		std::fprintf(stderr, "unpinMessage(): message was not pinned.");
+	}
+}
+
+void MyClientClass::fn_changeNickname(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrNicknamedUserID, const std::string& acrNickname) {
+	editMember(arServerID, acrNicknamedUserID, acrNickname);
+}
+
+void MyClientClass::fn_removeRole(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrRemovedUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
+	removeRole(arServerID, acrRemovedUserID, acrRoleID);
+}
+
+void MyClientClass::fn_deleteRole(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
+	deleteRole(arServerID, acrRoleID);
+}
+
+void MyClientClass::fn_pruneUsers(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, int aNumDays) {
+	pruneMembers(arServerID, aNumDays);
+}
+
+void MyClientClass::fn_deleteInvite(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const std::string& acrInviteCode) {
+	deleteInvite(acrInviteCode);
+}
+
+void MyClientClass::fn_deleteChannelInvites(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+	auto lVec = getChannelInvites(acrChannelID).vector();
+	for(auto lInvite : lVec) {
+		deleteInvite(lInvite.code);
+	}
+}
+
+void MyClientClass::fn_deleteAllInvites(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser) {
+	auto lVec = getServerInvites(arServerID).vector();
+	for(auto lInvite : lVec) {
+		deleteInvite(lInvite.code);
+	}
+}
+
+void MyClientClass::fn_leaveServer(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser) {
+	leaveServer(arServerID);
+}
+
+void MyClientClass::fn_setStatus(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const std::string& acrActivityName, const SleepyDiscord::Status acStatus, bool abAFK, int aIdleTime) {
+	updateStatus(acrActivityName, aIdleTime, acStatus, abAFK);
+}
+
 void MyClientClass::fn_die(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
 	const std::string lcMessage = "Okay.";
 	echo(arServerID, acrUser, acrChannelID, lcMessage);
-	std::exit(0);
+	quit();
 }
 
 void MyClientClass::fn_bannedOps(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
@@ -360,7 +505,6 @@ void MyClientClass::fn_sonarPing(SleepyDiscord::Snowflake<SleepyDiscord::Server>
 		}
 	}
 }
-
 
 std::vector<std::string> MyClientClass::split(const std::string& acrString) { // split std::string into vector of words delimited by whitespace
 	std::vector<std::string> lVec;
