@@ -4,6 +4,11 @@
 #include "bot_client.hpp"
 #include "mention.hpp"
 
+void MyClientClass::init() {
+	ownerID = 518216114665291786;
+	botID = 783177811950960670;
+}
+
 void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 	const std::string& lcrPrefix = m_serverBotSettings[aMessage.serverID].prefix;
 	if (aMessage.startsWith(lcrPrefix + "prefix ")) {
@@ -46,9 +51,9 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		} else {
 			unban(aMessage.serverID, aMessage.author, aMessage.channelID, words[1], aMessage.content.substr(lcrPrefix.size() + unban.name.size() + 1 + words[1].size() + 1));
 		}
-	} else if (aMessage.startsWith(lcrPrefix + "invite ")) {
+	} else if (aMessage.startsWith(lcrPrefix + "invite send ")) {
 		auto words = split(aMessage.content);
-		invite(aMessage.serverID, aMessage.author, aMessage.channelID, getSnowflake(words[1]));
+		invite(aMessage.serverID, aMessage.author, aMessage.channelID, getSnowflake(words[2]));
 	} else if (aMessage.startsWith(lcrPrefix + "bot_admin_role set ")) {
 		setBotAdminRole(aMessage.serverID, aMessage.author, getSnowflake(aMessage.content.substr(lcrPrefix.size() + setBotAdminRole.name.size() + 1)));
 	} else if (aMessage.startsWith(lcrPrefix + "nologs")) {
@@ -70,15 +75,15 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 	} else if (aMessage.startsWith(lcrPrefix + "channel rename ")) {
 		renameChannel(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[2]), split(aMessage.content)[3]);
 	} else if (aMessage.startsWith(lcrPrefix + "channel topic set ")) {
-		setChannelTopic(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[3]), aMessage.content.substr(removeChannel.name.size() + 1 + split(aMessage.content)[3].size() + 1));
+		setChannelTopic(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[3]), aMessage.content.substr(lcrPrefix.size() + setChannelTopic.name.size() + 1 + split(aMessage.content)[3].size() + 1));
 	} else if (aMessage.startsWith(lcrPrefix + "channel delete ")) {
 		removeChannel(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[2]));
-	} else if (aMessage.startsWith(lcrPrefix + "pin ")) {
-		pin(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[1]));
-	} else if (aMessage.startsWith(lcrPrefix + "unpin ")) {
-		unpin(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[1]));
-	} else if (aMessage.startsWith(lcrPrefix + "nickname ")) {
-		changeNickname(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[1]), split(aMessage.content)[2]);
+	} else if (aMessage.startsWith(lcrPrefix + "pin ")) { // http error
+		//pin(aMessage.serverID, aMessage.author, aMessage.channelID, split(aMessage.content)[1]);
+	} else if (aMessage.startsWith(lcrPrefix + "unpin ")) { // http error
+		//unpin(aMessage.serverID, aMessage.author, aMessage.channelID, split(aMessage.content)[1]);
+	} else if (aMessage.startsWith(lcrPrefix + "nickname ")) { // discord permissions error on changing other users' nicknames
+		changeNickname(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[1]), aMessage.content.substr(lcrPrefix.size() + changeNickname.name.size() + 1 + split(aMessage.content)[1].size() + 1));
 	} else if (aMessage.startsWith(lcrPrefix + "role revoke ")) {
 		revokeRole(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[2]), getSnowflake(split(aMessage.content)[3]));
 	} else if (aMessage.startsWith(lcrPrefix + "role delete ")) {
@@ -95,8 +100,10 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 	} else if (aMessage.startsWith(lcrPrefix + "invite delete ")) {
 		deleteInviteCode(aMessage.serverID, aMessage.author, split(aMessage.content)[2]);
 	} else if (aMessage.startsWith(lcrPrefix + "channel invites delete ")) {
-		deleteChannelInvites(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[2]));
-	} else if (aMessage.startsWith(lcrPrefix + "leave ")) {
+		deleteChannelInvites(aMessage.serverID, aMessage.author, getSnowflake(split(aMessage.content)[3]));
+	} else if (aMessage.startsWith(lcrPrefix + "invites delete all")) {
+		deleteServerInvites(aMessage.serverID, aMessage.author);
+	} else if (aMessage.startsWith(lcrPrefix + "leave")) {
 		leave(aMessage.serverID, aMessage.author);
 	} else if (aMessage.startsWith(lcrPrefix + "status ")) {
 		auto lWords = split(aMessage.content);
@@ -440,7 +447,12 @@ void MyClientClass::fn_unpinMessage(SleepyDiscord::Snowflake<SleepyDiscord::Serv
 }
 
 void MyClientClass::fn_changeNickname(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrNicknamedUserID, const std::string& acrNickname) {
-	editMember(arServerID, acrNicknamedUserID, acrNickname);
+	if(isBot(acrNicknamedUserID)) {
+		editNickname(arServerID, acrNickname);
+	} else {
+		// throws discord permissions error
+		//editMember(arServerID, acrNicknamedUserID, acrNickname);
+	}
 }
 
 void MyClientClass::fn_removeRole(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrRemovedUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
@@ -455,8 +467,16 @@ void MyClientClass::fn_pruneUsers(SleepyDiscord::Snowflake<SleepyDiscord::Server
 	pruneMembers(arServerID, aNumDays);
 }
 
-void MyClientClass::fn_deleteInvite(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const std::string& acrInviteCode) {
-	deleteInvite(acrInviteCode);
+void MyClientClass::fn_deleteInvite(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const std::string& acrInvite) {
+	std::string lInviteCode;
+	if(acrInvite.find("https://discord.gg/") != std::string::npos) {
+		lInviteCode = acrInvite.substr(strlen("https://discord.gg/"));
+	} else if(acrInvite.find("discord.gg/") != std::string::npos) {
+		lInviteCode = acrInvite.substr(strlen("discord.gg/"));
+	} else {
+		lInviteCode = acrInvite;
+	}
+	deleteInvite(lInviteCode);
 }
 
 void MyClientClass::fn_deleteChannelInvites(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
@@ -556,6 +576,10 @@ MyClientClass::COMMAND_TYPE MyClientClass::toCommandType(const std::string& acrS
 		{ std::string("all"), COMMAND_TYPE::ROLE_ALL }
 	};
 	return lType.at(acrString);
+}
+
+bool MyClientClass::isBot(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
+	return acrUserID == botID;
 }
 
 bool MyClientClass::isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUser) {
