@@ -29,21 +29,3 @@ bool ServerBotSettings::operator!=(const ServerBotSettings& acrRhs) const {
 		return false;
 	}
 }
-
-bool ServerBotSettingsComparator::operator()(const ServerBotSettings& acrLhs, const ServerBotSettings& acrRhs) const {
-	if(acrRhs == ServerBotSettings() && acrRhs != ServerBotSettings()) {
-		return 0;
-	}
-	else {
-		return 1;
-	}
-}
-
-bool ServerBotSettingsComparator::operator()(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrLhs, const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrRhs) const {
-	if(acrLhs == SleepyDiscord::Snowflake<SleepyDiscord::Server>() && acrRhs != SleepyDiscord::Snowflake<SleepyDiscord::Server>()) {
-		return 0;
-	}
-	else {
-		return 1;
-	}
-}

@@ -7,6 +7,8 @@
 
 #include "sleepy_discord/sleepy_discord.h"
 
+// struct to hold per-server info for the bot
+// used in client's m_serverBotSettings map
 struct ServerBotSettings {
     bool silent = false; // don't send any messages
     bool noLogs = false; // don't log anything
@@ -21,11 +23,6 @@ struct ServerBotSettings {
 	ServerBotSettings(); // base constructor
 	bool operator==(const ServerBotSettings& acrRhs) const;
 	bool operator!=(const ServerBotSettings& acrRhs) const;
-};
-
-struct ServerBotSettingsComparator {
-	bool operator()(const ServerBotSettings& arcLhs, const ServerBotSettings& acrRhs) const;
-	bool operator()(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrLhs, const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrRhs) const;
 };
 
 #endif
