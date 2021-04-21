@@ -11,8 +11,12 @@
 
 #define ASIO_NO_EXCEPTIONS
 
-class MyClientClass;
+class MyClientClass; // forward declaration for declaration of Command::m_client
 
+// creates command for bot
+
+// operator() overloaded to allow for automatic permission checking
+// instead of doing it in every function
 class Command {
 public:
     enum COMMAND_PERMISSION {
@@ -78,7 +82,7 @@ private:
     bool m_noOwner; // set to true if command shouldn't be able to affect owner - i.e., ban, kick, etc.
 
     // permissions for each server
-    std::map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, COMMAND_TYPE, ServerBotSettingsComparator> m_permissions;
+    std::unordered_map<std::string, COMMAND_TYPE> m_permissions;
 
     bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) const;
     static bool hasRole(SleepyDiscord::Server& arServer, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID);

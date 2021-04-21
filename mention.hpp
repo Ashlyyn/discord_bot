@@ -1,6 +1,8 @@
 #ifndef _MENTION_H_
 #define _MENTION_H_
 
+// creates mention from snowflake
+// operator const std::string() and operator+() overloaded to allow ease of use with std::string
 template<class T> class Mention {
 public:
     Mention(const std::string& acrSnowflake);
