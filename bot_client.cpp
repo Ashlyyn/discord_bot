@@ -1,6 +1,3 @@
-#include <thread>
-#include <chrono>
-
 #include "bot_client.hpp"
 #include "mention.hpp"
 

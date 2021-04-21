@@ -2,6 +2,8 @@
 
 #include "mention.hpp"
 
+#include <string>
+
 // templates specialized since user, channel, and role all have a different prefix
 
 template<> Mention<SleepyDiscord::User>::Mention(const std::string& snowflake) {

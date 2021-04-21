@@ -1,7 +1,6 @@
 #ifndef _BOT_CLIENT_H_
 #define _BOT_CLIENT_H_
 
-#include <array>
 #include <map>
 #include <vector>
 

@@ -2,14 +2,10 @@
 #define _COMMAND_H_
 
 #include <map>
-#include <vector>
-#include <functional>
 
 #include "sleepy_discord/sleepy_discord.h"
 
 #include "server_bot_settings.hpp"
-
-#define ASIO_NO_EXCEPTIONS
 
 class MyClientClass; // forward declaration for declaration of Command::m_client
 
