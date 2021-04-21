@@ -4,6 +4,7 @@
 int main() {
 	MyClientClass client("NzgzMTc3ODExOTUwOTYwNjcw.X8W9LQ.Vo5Fs4L-081B3ENZ337arDewGtE", SleepyDiscord::USER_CONTROLED_THREADS);
 	try{
+		client.init();
 		client.run();
 	} catch(std::runtime_error& e) {
 		std::fprintf(stderr, "%s\n", e.what());
