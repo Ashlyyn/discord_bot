@@ -19,7 +19,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[1]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): dm: %s\n", e.what());
 			return;
 		}
@@ -32,7 +32,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[2]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): mute text: %s\n", e.what());
 			return;
 		}
@@ -41,7 +41,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[2]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): unmute text: %s\n", e.what());
 			return;
 		}
@@ -50,7 +50,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[1]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): kick: %s\n", e.what());
 			return;
 		}
@@ -63,7 +63,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[1]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): ban: %s\n", e.what());
 			return;
 		}
@@ -84,7 +84,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[2]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): invite send: %s\n", e.what());
 			return;
 		}
@@ -93,7 +93,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[2]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): bot_admin_role set: %s\n", e.what());
 			return;
 		}
@@ -108,7 +108,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[1]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): logs: %s\n", e.what());
 			return;
 		}
@@ -125,7 +125,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[2]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): channel rename: %s\n", e.what());
 			return;
 		}
@@ -134,7 +134,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[3]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): channel topic set: %s\n", e.what());
 			return;
 		}
@@ -144,7 +144,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[2]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): channel delete: %s\n", e.what());
 			return;
 		}
@@ -157,7 +157,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[1]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): nickname: %s\n", e.what());
 			return;
 		}
@@ -169,7 +169,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		try {
 			lSnowflake1 = getSnowflake(lcWords[2]);
 			lSnowflake2 = getSnowflake(lcWords[3]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): role revoke: %s\n", e.what());
 			return;
 		}
@@ -178,7 +178,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[2]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): mute text: %s\n", e.what());
 			return;
 		}
@@ -198,7 +198,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[3]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): channel invites delete: %s\n", e.what());
 			return;
 		}
@@ -234,14 +234,15 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 				} else if (lcWords[3] == "0" || lcWords[3] == "false") {
 					lbAFK = false;
 				} else {
-					throw std::runtime_error("onMessage(): status provided with invalid value for bool value.\n");
+					std::fprintf(stderr, "onMessage(): status: provided with invalid value for bool value.\n");
+					return;
 				}
 			}
 			if(lcWords.size() > 4) {
 				try {
 					lIdleTime = std::stoi(lcWords[4]);
 				} catch(std::out_of_range& e) {
-					std::fprintf(stderr, "onMessage(): status provided with out of range value for lIdleTime.\n");
+					std::fprintf(stderr, "onMessage(): status: provided with out of range value for lIdleTime.\n");
 					return;
 				}
 			}
@@ -265,11 +266,11 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		std::string lSnowflake;
 		try {
 			lSnowflake = getSnowflake(lcWords[1]);
-		} catch(std::runtime_error& e) {
+		} catch(std::exception& e) {
 			fprintf(stderr, "onMessage(): sonar_ping: %s\n", e.what());
 			return;
 		}
-		sonarPing(aMessage.serverID, aMessage.author, aMessage.channelID, lSnowflake, lNumPings);
+		sonarPing(aMessage.serverID, aMessage.author, lSnowflake, aMessage.channelID, lNumPings);
 	} else if (aMessage.startsWith(lcrPrefix + "fuckoff")) {
 		fuckoff(aMessage.serverID, aMessage.author);
 	}
@@ -620,7 +621,7 @@ void MyClientClass::fn_bannedOps(SleepyDiscord::Snowflake<SleepyDiscord::Server>
 	echo(arServerID, acrUser, acrChannelID, lcMessage);
 }
 
-void MyClientClass::fn_sonarPing(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrPingedUserID, unsigned int aCount) {
+void MyClientClass::fn_sonarPing(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrPingedUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, unsigned int aCount) {
 	if(aCount == 0) {
 		return;
 	} else {
