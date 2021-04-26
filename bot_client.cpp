@@ -2,8 +2,7 @@
 #include "mention.hpp"
 
 void MyClientClass::init() {
-	ownerID = 518216114665291786;
-	botID = 783177811950960670;
+	
 }
 
 void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
@@ -209,7 +208,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 		leave(aMessage.serverID, aMessage.author);
 	} else if (aMessage.startsWith(lcrPrefix + "status ")) { // not verified working
 		if(lcWords.size() == 1) {
-			fprintf(stderr, "onMessage(): status provided with no arguments.\n");
+			fprintf(stderr, "onMessage(): status: provided with no arguments.\n");
 			return;
 		} else {
 			const std::string& lcrActivity = lcWords[1];
@@ -217,16 +216,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 			bool lbAFK = false;
 			int lIdleTime = 0;
 			if(lcWords.size() > 2) {
-				std::map<std::string, SleepyDiscord::Status> lStatuses = {
-					{ "online", 		SleepyDiscord::Status::online },
-					{ "dnd", 			SleepyDiscord::Status::doNotDisturb },
-					{ "do_not_disturb", SleepyDiscord::Status::doNotDisturb },
-					{ "afk",			SleepyDiscord::Status::idle },
-					{ "idle",			SleepyDiscord::Status::idle },
-					{ "invisible",		SleepyDiscord::Status::invisible },
-					{ "offline",		SleepyDiscord::Status::offline }
-				};
-				lStatus = lStatuses.at(lcWords[2]);
+				lStatus = toStatus(lcWords[2]);
 			} 
 			if(lcWords.size() > 3) {
 				if(lcWords[3] == "1" || lcWords[3] == "true") {
@@ -234,20 +224,45 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 				} else if (lcWords[3] == "0" || lcWords[3] == "false") {
 					lbAFK = false;
 				} else {
-					throw std::runtime_error("onMessage(): status provided with invalid value for bool value.\n");
+					throw std::runtime_error("onMessage(): status: provided with invalid value for bool value.\n");
 				}
 			}
 			if(lcWords.size() > 4) {
 				try {
 					lIdleTime = std::stoi(lcWords[4]);
 				} catch(std::out_of_range& e) {
-					std::fprintf(stderr, "onMessage(): status provided with out of range value for lIdleTime.\n");
+					std::fprintf(stderr, "onMessage(): status: provided with out of range value for lIdleTime.\n");
 					return;
 				}
 			}
 			status(aMessage.serverID, aMessage.author, lcrActivity, lStatus, lbAFK, lIdleTime);
 		}
-	} 
+	} else if (aMessage.startsWith(lcrPrefix + "bot activity set")) {
+		setBotActivity(aMessage.serverID, aMessage.author, aMessage.content.substr(setBotActivity.name.size() + 1));
+	} else if (aMessage.startsWith(lcrPrefix + "bot idle set")) {
+		uint64_t lIdleTime;
+		try {
+			lIdleTime = std::stoi(lcWords[3]);
+		} catch(const std::exception& e) {
+			std::fprintf(stderr, "onMessage(): bot idle set: provided with out of range value for lIdleTime.\n");
+			return;
+		}
+		setBotIdle(aMessage.serverID, aMessage.author, lIdleTime);
+	} else if (aMessage.startsWith(lcrPrefix + "bot status set")) {
+		setBotStatus(aMessage.serverID, aMessage.author, toStatus(lcWords[3]));
+	} else if (aMessage.startsWith(lcrPrefix + "bot afk set")) {
+		bool b;
+		if(lcWords[3] == "1" || lcWords[3] == "true") {
+			b = true;
+		} else if(lcWords[3] == "0" || lcWords[3] == "false") {
+			b = false;
+		}
+		else {
+			std::fprintf(stderr, "onMessage(): bot afk set: provided with invalid bool value.\n");
+			return;
+		}
+		setBotAFK(aMessage.serverID, aMessage.author, b);
+	}
 	
 	else if (aMessage.startsWith(lcrPrefix + "die")) {
 		die(aMessage.serverID, aMessage.author, aMessage.channelID);
@@ -270,11 +285,11 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 			return;
 		}
 		sonarPing(aMessage.serverID, aMessage.author, aMessage.channelID, lSnowflake, lNumPings);
-	} else if (aMessage.startsWith(lcrPrefix + "fuckoff")) {
+	} else if (aMessage.startsWith(lcrPrefix + "fuckoff")) { // not verified working
 		fuckoff(aMessage.serverID, aMessage.author);
 	}
 
-	else if(aMessage.startsWith(lcrPrefix)) { // not verified working
+	else if(aMessage.startsWith(lcrPrefix)) {
 		const std::string lcMessage = "Unknown command.";
 		echo(aMessage.serverID, aMessage.author, aMessage.channelID, lcMessage);
 	}
@@ -609,6 +624,26 @@ void MyClientClass::fn_setStatus(SleepyDiscord::Snowflake<SleepyDiscord::Server>
 	updateStatus(acrActivityName, aIdleTime, acStatus, abAFK);
 }
 
+void MyClientClass::fn_setBotActivity(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const std::string& acrActivityName) {
+	botStatus.activity = acrActivityName;
+	updateStatus(botStatus.activity, botStatus.idleSince, botStatus.status, botStatus.AFK);
+}
+
+void MyClientClass::fn_setBotIdle(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, int aIdleTime) {
+	botStatus.idleSince = aIdleTime;
+	updateStatus(botStatus.activity, botStatus.idleSince, botStatus.status, botStatus.AFK);
+}
+
+void MyClientClass::fn_setBotStatus(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Status acStatus) {
+	botStatus.status = acStatus;
+	updateStatus(botStatus.activity, botStatus.idleSince, botStatus.status, botStatus.AFK);
+}
+	
+void MyClientClass::fn_setBotAFK(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, bool abAFK) {
+	botStatus.AFK = abAFK;
+	updateStatus(botStatus.activity, botStatus.idleSince, botStatus.status, botStatus.AFK);
+}
+
 void MyClientClass::fn_die(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
 	const std::string lcMessage = "Okay.";
 	echo(arServerID, acrUser, acrChannelID, lcMessage);
@@ -686,12 +721,26 @@ MyClientClass::COMMAND_TYPE MyClientClass::toCommandType(const std::string& acrS
 	return lType.at(acrString);
 }
 
+SleepyDiscord::Status MyClientClass::toStatus(const std::string& acrString) {
+	std::map<std::string, SleepyDiscord::Status> lStatuses = {
+		{ "online", 		SleepyDiscord::Status::online },
+		{ "dnd", 			SleepyDiscord::Status::doNotDisturb },
+		{ "do_not_disturb", SleepyDiscord::Status::doNotDisturb },
+		{ "afk",			SleepyDiscord::Status::idle },
+		{ "idle",			SleepyDiscord::Status::idle },
+		{ "invisible",		SleepyDiscord::Status::invisible },
+		{ "offline",		SleepyDiscord::Status::offline }
+	};
+
+	return lStatuses.at(acrString);
+}
+
 bool MyClientClass::isBot(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
 	return acrUserID == botID;
 }
 
-bool MyClientClass::isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUser) {
-	if(std::count(m_serverBotSettings.at(acrServerID).mutedUserIDs.begin(), m_serverBotSettings.at(acrServerID).mutedUserIDs.end(), acrUser) >= 1) {
+bool MyClientClass::isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUser) const {
+	if(std::count(m_serverBotSettings.at(acrServerID).mutedUserIDs.begin(), m_serverBotSettings.at(acrServerID).mutedUserIDs.end(), acrUser) > 0) {
 		return true;
 	} else {
 		return false;

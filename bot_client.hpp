@@ -13,7 +13,7 @@ class MyClientClass : public SleepyDiscord::DiscordClient {
 public:
 	using SleepyDiscord::DiscordClient::DiscordClient;
 
-	// command object				  name						client 	command type (admin or non-admin)	function pointer			noOwner
+	// command object				  		name				client 	command type (admin or non-admin)	function pointer			noOwner
 	Command changePrefix 		 = Command("prefix",			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_changePrefix);
 	Command hello 				 = Command("hello",				this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_hello);
 	Command echo  				 = Command("echo",				this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_echo);
@@ -49,10 +49,14 @@ public:
 	Command deleteServerInvites	 = Command("invites delete all",this, Command::COMMAND_TYPE::ADMIN, 	&MyClientClass::fn_deleteAllInvites);
 	Command leave				 = Command("leave",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_leaveServer);
 	Command status				 = Command("status",			this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setStatus);
-	
+	Command setBotActivity		 = Command("bot activity set",	this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setBotActivity);
+	Command setBotIdle			 = Command("bot idle set",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setBotIdle);
+	Command setBotStatus		 = Command("bot status set",	this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setBotStatus);
+	Command setBotAFK			 = Command("bot afk set",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setBotAFK);
+
 	Command die					 = Command("die",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_die);
 	Command bannedOps			 = Command("banned_ops",		this, Command::COMMAND_TYPE::NON_ADMIN,	&MyClientClass::fn_bannedOps);
-	Command sonarPing			 = Command("sonar_ping",		this, Command::COMMAND_TYPE::NON_ADMIN,	&MyClientClass::fn_sonarPing,	true);
+	Command sonarPing			 = Command("sonar_ping",		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_sonarPing,	true);
 	Command fuckoff				 = Command("fuckoff",			this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_leaveServer);
 
 	void init();
@@ -75,11 +79,19 @@ public:
 		ROLE_ALL
 	};
 
-	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> ownerID;
-	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> botID;
+	struct {
+		std::string activity = "";
+		uint64_t idleSince = 0;
+		SleepyDiscord::Status status = SleepyDiscord::Status::online;
+		bool AFK = false;
+	} botStatus;
 
-	std::unordered_map<std::string, SleepyDiscord::Server> m_servers;	// map server IDs to servers
-	std::unordered_map<std::string, SleepyDiscord::Snowflake<SleepyDiscord::Channel>> m_userDMchannelIDs;
+	const inline static SleepyDiscord::Snowflake<SleepyDiscord::User> ownerID = 518216114665291786;
+	const inline static SleepyDiscord::Snowflake<SleepyDiscord::User> botID   = 783177811950960670;
+
+	// std::string used in place of SleepyDiscord::Snowflake to prevent needing to supply a hash
+	std::unordered_map<std::string, SleepyDiscord::Server> m_servers;	// map server IDs to server objects
+	std::unordered_map<std::string, SleepyDiscord::Snowflake<SleepyDiscord::Channel>> m_userDMchannelIDs; // map server IDs to DM channel IDs
 	std::unordered_map<std::string, ServerBotSettings> m_serverBotSettings; // map server IDs to their respective settings struct
 	std::unordered_map<std::string, std::pair<SleepyDiscord::User, bool>> m_bannedUsers; // map server IDs to users banned from servers 
 																						 // and whether they were banned via the bot
@@ -87,7 +99,8 @@ public:
 																						 // same thing with the bool
 
 protected:
-	// functions for bot - to be passed to their respective Command object; server ID and user must be passed for permissions checking even if the function does not use it directly
+	// functions for bot - to be passed to their respective Command object 
+	// server ID and user must be passed for permissions checking even if the function does not use it directly
 	void fn_changePrefix		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrNewPrefix);
 	void fn_hello				(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
 	void fn_echo				(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrMessage);
@@ -123,7 +136,11 @@ protected:
 	void fn_deleteAllInvites	(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser);
 	void fn_leaveServer			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser);
 	void fn_setStatus			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const std::string& acrActivityName = "", const SleepyDiscord::Status acStatus = SleepyDiscord::Status::online, bool abAFK = false, int aIdleTime = 0);
-	
+	void fn_setBotActivity		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const std::string& acrActivityName = "");
+	void fn_setBotIdle			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, int aIdleTime = 0);
+	void fn_setBotStatus		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Status acStatus = SleepyDiscord::Status::online);
+	void fn_setBotAFK			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, bool abAFK = false);
+
 	void fn_die					(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
 	void fn_bannedOps			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
 	void fn_sonarPing			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrPingedUserID, unsigned int aCount = 0);
@@ -132,8 +149,9 @@ protected:
 	static std::string getSnowflake			(const std::string& acrString); // get ID from mention
 	static COMMAND_TYPE toCommandType		(const std::string& acrString); // map string to command type
 	static COMMAND_PERMISSION toCommandPerm	(const std::string& acrString); // map string to command perm
+	static SleepyDiscord::Status toStatus	(const std::string& acrString);
 	static bool isBot						(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);
-		   bool isMuted						(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);
+		   bool isMuted						(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) const;
 };
 
 #endif
