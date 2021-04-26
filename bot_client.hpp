@@ -86,8 +86,8 @@ public:
 		bool AFK = false;
 	} botStatus;
 
-	const inline static SleepyDiscord::Snowflake<SleepyDiscord::User> ownerID = 518216114665291786;
-	const inline static SleepyDiscord::Snowflake<SleepyDiscord::User> botID   = 783177811950960670;
+	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> ownerID = 518216114665291786;
+	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> botID   = 783177811950960670;
 
 	// std::string used in place of SleepyDiscord::Snowflake to prevent needing to supply a hash
 	std::unordered_map<std::string, SleepyDiscord::Server> m_servers;	// map server IDs to server objects
