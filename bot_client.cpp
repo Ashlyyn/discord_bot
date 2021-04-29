@@ -708,33 +708,39 @@ std::string MyClientClass::getSnowflake(const std::string& acrString) {
 }
 
 MyClientClass::COMMAND_PERMISSION MyClientClass::toCommandPerm(const std::string& acrString) {
-	if((acrString != "owner_only") && (acrString != "bot_admin") && (acrString != "all")) {
+    std::map<std::string, COMMAND_PERMISSION> lPerms = {
+		{ std::string("owner_only"), COMMAND_PERMISSION::OWNER_ONLY },
+		{ std::string("bot_admin"), COMMAND_PERMISSION::BOT_ADMIN },
+		{ std::string("all"), COMMAND_PERMISSION::CMD_ALL }
+	};
+
+    MyClientClass::COMMAND_PERMISSION lPerm;
+    try {
+        lPerm = lPerms.at(acrString);
+    }
+    catch(std::out_of_range& e) {
 		std::string lError = "toCommandPerm: invalid string provided (" + acrString + ")";
 		throw std::runtime_error(lError);
         return MyClientClass::COMMAND_PERMISSION::PERM_NULL;
 	}
 
-	std::map<std::string, COMMAND_PERMISSION> lPerms = {
-		{ std::string("owner_only"), COMMAND_PERMISSION::OWNER_ONLY },
-		{ std::string("bot_admin"), COMMAND_PERMISSION::BOT_ADMIN },
-		{ std::string("all"), COMMAND_PERMISSION::CMD_ALL }
-	};
-	return lPerms.at(acrString);
+	return lPerm;
 }
 
 MyClientClass::COMMAND_TYPE MyClientClass::toCommandType(const std::string& acrString) {
-	if((acrString != "admin") && (acrString != "non_admin") && (acrString != "all")) {
-		std::string lError = "toCommandType: invalid string provided (" + acrString + ")";
-		throw std::runtime_error(lError);
-        return MyClientClass::COMMAND_TYPE::TYPE_NULL;
-	}
-
-	std::map<std::string, COMMAND_TYPE> lType = {
+	std::map<std::string, COMMAND_TYPE> lTypes = {
 		{ std::string("admin"), COMMAND_TYPE::ADMIN },
 		{ std::string("non_admin"), COMMAND_TYPE::NON_ADMIN },
 		{ std::string("all"), COMMAND_TYPE::ROLE_ALL }
 	};
-	return lType.at(acrString);
+    MyClientClass::COMMAND_TYPE lType;
+    try {
+        lType = lTypes.at(acrString);
+    } catch(std::out_of_range& e) {
+        std::string lError = "toCommandType: invalid string provided (" + acrString + ")";
+		throw std::runtime_error(lError);
+	}
+	return lTypes.at(acrString);
 }
 
 SleepyDiscord::Status MyClientClass::toStatus(const std::string& acrString) {
