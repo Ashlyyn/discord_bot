@@ -2,8 +2,7 @@
 #include "mention.hpp"
 
 void MyClientClass::init() {
-	ownerID = 518216114665291786;
-	botID = 783177811950960670;
+
 }
 
 void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
@@ -713,7 +712,6 @@ MyClientClass::COMMAND_PERMISSION MyClientClass::toCommandPerm(const std::string
 		{ std::string("bot_admin"), COMMAND_PERMISSION::BOT_ADMIN },
 		{ std::string("all"), COMMAND_PERMISSION::CMD_ALL }
 	};
-
     MyClientClass::COMMAND_PERMISSION lPerm;
     try {
         lPerm = lPerms.at(acrString);
@@ -721,9 +719,7 @@ MyClientClass::COMMAND_PERMISSION MyClientClass::toCommandPerm(const std::string
     catch(std::out_of_range& e) {
 		std::string lError = "toCommandPerm: invalid string provided (" + acrString + ")";
 		throw std::runtime_error(lError);
-        return MyClientClass::COMMAND_PERMISSION::PERM_NULL;
 	}
-
 	return lPerm;
 }
 
@@ -740,7 +736,7 @@ MyClientClass::COMMAND_TYPE MyClientClass::toCommandType(const std::string& acrS
         std::string lError = "toCommandType: invalid string provided (" + acrString + ")";
 		throw std::runtime_error(lError);
 	}
-	return lTypes.at(acrString);
+	return lType;
 }
 
 SleepyDiscord::Status MyClientClass::toStatus(const std::string& acrString) {
