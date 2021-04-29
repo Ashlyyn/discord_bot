@@ -57,7 +57,7 @@ public:
         
         else {
             // check if user is allowed to execute command; logAction() is excepted, since no user will ever call it
-            if((checkPermissions(arServerID, acrUser) == true) || (name == "log_action")) {
+            if((checkPermissions(arServerID, acrUser) == true) || (m_name == "log_action")) {
                 // server and user must be passed to all functions, even those that do not use them directly
                 // to allow for permission checking
                 (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServerID, acrUser, args...);
@@ -65,7 +65,9 @@ public:
         }
     }
 
-    inline std::string& name();
+    inline std::string& name() {
+        return m_name;
+    }
 
 private:
     MyClientClass* m_client;

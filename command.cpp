@@ -3,10 +3,6 @@
 
 #include "sleepy_discord/sleepy_discord.h"
 
-std::string& Command::name() {
-	return m_name;
-}
-
 bool Command::isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
 	if (acrUserID == MyClientClass::s_ownerID) {
 		return true;
