@@ -58,20 +58,12 @@ public:
         }
         
         else {
-            std::tuple<Args...> args_tuple(args...);
-            // check if user is owner and command has m_noOwner set
-            //if(m_noOwner == false) {
-                // check if user is allowed to execute command; logAction() is excepted, since no user will ever call it
-                //perms_check:
-                if((checkPermissions(arServerID, acrUser) == true) || (name == "log_action")) {
-                    // server and user must be passed to all functions, even those that do not use them directly
-                    // to allow for permission checking
-                    (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServerID, acrUser, args...);
-                }
-            //}
-            /* else if ((m_noOwner == true) && (isOwner(std::get<0>(args_tuple)))) {
-                goto perms_check;
-            } */
+            // check if user is allowed to execute command; logAction() is excepted, since no user will ever call it
+            if((checkPermissions(arServerID, acrUser) == true) || (name == "log_action")) {
+                // server and user must be passed to all functions, even those that do not use them directly
+                // to allow for permission checking
+                (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServerID, acrUser, args...);
+            }
         }
     }
 
