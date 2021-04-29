@@ -11,11 +11,11 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 	    const std::string& lcrPrefix = m_serverBotSettings[aMessage.serverID].prefix;
 	    const auto lcWords = split(aMessage.content);
 	    if (aMessage.startsWith(lcrPrefix + "prefix ")) {
-	    	changePrefix(aMessage.serverID, aMessage.author, aMessage.channelID, aMessage.content.substr(lcrPrefix.size() + changePrefix.name.size() + 1));
+	    	changePrefix(aMessage.serverID, aMessage.author, aMessage.channelID, aMessage.content.substr(lcrPrefix.size() + changePrefix.name().size() + 1));
 	    } else if (aMessage.startsWith(lcrPrefix + "hello")) {
 	    	hello(aMessage.serverID, aMessage.author, aMessage.channelID);
 	    } else if (aMessage.startsWith(lcrPrefix + "echo ")) {
-	    	echo(aMessage.serverID, aMessage.author, aMessage.channelID, aMessage.content.substr(lcrPrefix.size() + echo.name.size() + 1));
+	    	echo(aMessage.serverID, aMessage.author, aMessage.channelID, aMessage.content.substr(lcrPrefix.size() + echo.name().size() + 1));
 	    } else if (aMessage.startsWith(lcrPrefix + "dm ")) {
 	    	std::string lSnowflake;
 	    	try {
@@ -24,11 +24,11 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
                 const std::string lcError = std::string("dm: ") + e.what();
 			    throw std::runtime_error(lcError);
 		    }
-		    dmUser(aMessage.serverID, aMessage.author, lSnowflake, aMessage.content.substr(lcrPrefix.size() + dmUser.name.size() + 1 + lcWords[1].size() + 1));
+		    dmUser(aMessage.serverID, aMessage.author, lSnowflake, aMessage.content.substr(lcrPrefix.size() + dmUser.name().size() + 1 + lcWords[1].size() + 1));
 	    } else if (aMessage.startsWith(lcrPrefix + "mute voice ")) {
-	    	muteVoice(aMessage.serverID, aMessage.author, aMessage.content.substr(lcrPrefix.size() + muteVoice.name.size() + 1));
+	    	muteVoice(aMessage.serverID, aMessage.author, aMessage.content.substr(lcrPrefix.size() + muteVoice.name().size() + 1));
 	    } else if (aMessage.startsWith(lcrPrefix + "unmute voice ")) {
-	    	unmuteVoice(aMessage.serverID, aMessage.author, aMessage.content.substr(lcrPrefix.size() + unmuteVoice.name.size() + 1));
+	    	unmuteVoice(aMessage.serverID, aMessage.author, aMessage.content.substr(lcrPrefix.size() + unmuteVoice.name().size() + 1));
 	    } else if (aMessage.startsWith(lcrPrefix + "mute text ")) {
 	    	std::string lSnowflake;
 	    	try {
@@ -37,7 +37,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
                 const std::string lcError = std::string("mute text: ") + e.what();
 			    throw std::runtime_error(lcError);
 		    }
-		    muteText(aMessage.serverID, aMessage.author, getSnowflake(aMessage.content.substr(lcrPrefix.size() + muteText.name.size() + 1)));
+		    muteText(aMessage.serverID, aMessage.author, getSnowflake(aMessage.content.substr(lcrPrefix.size() + muteText.name().size() + 1)));
 	    } else if (aMessage.startsWith(lcrPrefix + "unmute text ")) {
 		    std::string lSnowflake;
 		    try {
@@ -46,7 +46,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
                 const std::string lcError = std::string("unmute text: ") + e.what();
 		    	throw std::runtime_error(lcError);
 		    }
-		    unmuteText(aMessage.serverID, aMessage.author, getSnowflake(aMessage.content.substr(lcrPrefix.size() + unmuteText.name.size() + 1)));
+		    unmuteText(aMessage.serverID, aMessage.author, getSnowflake(aMessage.content.substr(lcrPrefix.size() + unmuteText.name().size() + 1)));
     	} else if (aMessage.startsWith(lcrPrefix + "kick ")) {
     		std::string lSnowflake;
 	    	try {
@@ -58,7 +58,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
     		if(lcWords.size() == 2) {
 	    		kick(aMessage.serverID, aMessage.author, lSnowflake, "");
     		} else {
-	    		kick(aMessage.serverID, aMessage.author, lSnowflake, aMessage.content.substr(lcrPrefix.size() + kick.name.size() + 1 + lcWords[1].size() + 1));
+	    		kick(aMessage.serverID, aMessage.author, lSnowflake, aMessage.content.substr(lcrPrefix.size() + kick.name().size() + 1 + lcWords[1].size() + 1));
 		    }
     	} else if (aMessage.startsWith(lcrPrefix + "ban ")) {
 	    	std::string lSnowflake;
@@ -82,14 +82,14 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
                 if(lcWords.size() == 3) { 
 			        ban(aMessage.serverID, aMessage.author, lSnowflake, "", lDeleteMessageDays);
 		        } else {
-			        ban(aMessage.serverID, aMessage.author, lSnowflake, aMessage.content.substr(lcrPrefix.size() + ban.name.size() + 1 + lcWords[1].size() + 1 + lcWords[2].size() + 1), lDeleteMessageDays);
+			        ban(aMessage.serverID, aMessage.author, lSnowflake, aMessage.content.substr(lcrPrefix.size() + ban.name().size() + 1 + lcWords[1].size() + 1 + lcWords[2].size() + 1), lDeleteMessageDays);
                 }
             }
 	    } else if (aMessage.startsWith(lcrPrefix + "unban ")) {
 		    if(lcWords.size() == 2) {
 			    unban(aMessage.serverID, aMessage.author, aMessage.channelID, lcWords[1], "");
     		} else {
-	    		unban(aMessage.serverID, aMessage.author, aMessage.channelID, lcWords[1], aMessage.content.substr(lcrPrefix.size() + unban.name.size() + 1 + lcWords[1].size() + 1));
+	    		unban(aMessage.serverID, aMessage.author, aMessage.channelID, lcWords[1], aMessage.content.substr(lcrPrefix.size() + unban.name().size() + 1 + lcWords[1].size() + 1));
 		    }
     	} else if (aMessage.startsWith(lcrPrefix + "invite send ")) {
 	    	std::string lSnowflake;
@@ -149,7 +149,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
                 const std::string lcError = std::string("channel topic set: ") + e.what();
 	    		throw std::runtime_error(lcError);
 		    }
-    		setChannelTopic(aMessage.serverID, aMessage.author, lSnowflake, aMessage.content.substr(lcrPrefix.size() + setChannelTopic.name.size() + 1 + lcWords[3].size() + 1));
+    		setChannelTopic(aMessage.serverID, aMessage.author, lSnowflake, aMessage.content.substr(lcrPrefix.size() + setChannelTopic.name().size() + 1 + lcWords[3].size() + 1));
     	} else if (aMessage.startsWith(lcrPrefix + "channel delete ")) {
     		std::string lSnowflake;
 	    	try {
@@ -172,7 +172,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 	    		throw std::runtime_error(lcError);
 		    	return;
     		}
-    		changeNickname(aMessage.serverID, aMessage.author, lSnowflake, aMessage.content.substr(lcrPrefix.size() + changeNickname.name.size() + 1 + lcWords[1].size() + 1));
+    		changeNickname(aMessage.serverID, aMessage.author, lSnowflake, aMessage.content.substr(lcrPrefix.size() + changeNickname.name().size() + 1 + lcWords[1].size() + 1));
     	} else if (aMessage.startsWith(lcrPrefix + "role revoke ")) {
 	    	std::string lSnowflake1;
 		    std::string lSnowflake2;
@@ -248,7 +248,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 			}
 		    status(aMessage.serverID, aMessage.author, lcrActivity, lStatus, lbAFK, lIdleTime);
 	    } else if (aMessage.startsWith(lcrPrefix + "bot activity set")) {
-		    setBotActivity(aMessage.serverID, aMessage.author, aMessage.content.substr(setBotActivity.name.size() + 1));
+		    setBotActivity(aMessage.serverID, aMessage.author, aMessage.content.substr(setBotActivity.name().size() + 1));
 	    } else if (aMessage.startsWith(lcrPrefix + "bot idle set")) {
 		    uint64_t lIdleTime;
     		try {
@@ -758,7 +758,7 @@ SleepyDiscord::Status MyClientClass::toStatus(const std::string& acrString) {
 }
 
 bool MyClientClass::isBot(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
-	return acrUserID == botID;
+	return acrUserID == s_botID;
 }
 
 bool MyClientClass::isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUser) const {

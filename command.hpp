@@ -27,11 +27,9 @@ public:
 		ROLE_ALL
 	};
 
-    std::string name; // name of command as used by bot
-
     // set members to defaults
     Command() {
-        name = std::string();
+        m_name = std::string();
         m_client = nullptr;
         m_fpRun = nullptr;
         m_commandType = COMMAND_TYPE::NON_ADMIN;
@@ -41,7 +39,7 @@ public:
 
     
     template<typename ...Args> Command(const std::string& acrName, MyClientClass* apClient, COMMAND_TYPE aCommandType, void(MyClientClass::*fpFnptr)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...), bool b = false) {
-        name = acrName;
+        m_name = acrName;
         m_client = apClient;
         m_fpRun = (void(MyClientClass::*)(void)) fpFnptr; // cast to void(*)(void) to allow assignment to m_fpRun
         m_commandType = aCommandType;
@@ -67,9 +65,12 @@ public:
         }
     }
 
+    inline std::string& name();
+
 private:
     MyClientClass* m_client;
     void (MyClientClass::*m_fpRun)();
+    std::string m_name; // name of command as used by bot
     COMMAND_TYPE m_commandType;
     int m_numParams;
     bool m_noOwner; // set to true if command shouldn't be able to affect owner - i.e., ban, kick, etc.
