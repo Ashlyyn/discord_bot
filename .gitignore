@@ -1,4 +1,5 @@
 **.o
 **/deps
 **/build
-**.vscode
+**/.vscode
+**/.vs
