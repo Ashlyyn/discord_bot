@@ -13,53 +13,55 @@ class MyClientClass : public SleepyDiscord::DiscordClient {
 public:
 	using SleepyDiscord::DiscordClient::DiscordClient;
 
-	// command object				  		name				client 	command type (admin or non-admin)	function pointer			noOwner
-	Command changePrefix 		 = Command("prefix",			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_changePrefix);
-	Command hello 				 = Command("hello",				this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_hello);
-	Command echo  				 = Command("echo",				this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_echo);
-	Command dmUser  			 = Command("dm",				this, Command::COMMAND_TYPE::ADMIN, 	&MyClientClass::fn_dmUser);
-	Command muteVoice			 = Command("mute voice", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_muteVoice,	true);
-	Command unmuteVoice			 = Command("unmute voice", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unmuteVoice,	true);
-	Command muteText			 = Command("mute text", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_muteText,	true);
-	Command unmuteText			 = Command("unmute text", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unmuteText,	true);
-	Command kick				 = Command("kick", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_kick,		true);
-	Command ban					 = Command("ban", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_ban,			true);
-	Command unban				 = Command("unban", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unban);
-	Command invite				 = Command("invite send", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_invite);
-	Command setBotAdminRole 	 = Command("bot_admin_role set",this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_setBotAdminRole);
-	Command logsDisable			 = Command("logs disable", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_logsDisable);
-	Command logsEnable			 = Command("logs enable", 		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_logsDisable);
-	Command setLogsChannel		 = Command("logs", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_setLogsChannel);
-	Command setSilent			 = Command("silent",			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_setSilent);
-	Command noSilent 			 = Command("nosilent", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_logsDisable);
-	Command deleteMsg			 = Command("message delete",	this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_deleteMsg);
-	Command logAction			 = Command("log_action",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_logAction);
-	Command setPermissions		 = Command("permissions set",	this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setPermissions);
-	Command renameChannel		 = Command("channel rename",	this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setChannelName);
-	Command setChannelTopic		 = Command("channel topic set",	this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setChannelTopic);
-	Command removeChannel		 = Command("channel delete",	this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_deleteChannel);
-	Command pin					 = Command("pin",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_pinMessage);
-	Command unpin				 = Command("unpin",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_unpinMessage);
-	Command changeNickname		 = Command("nickname",			this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_changeNickname);
-	Command revokeRole			 = Command("role revoke",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_removeRole);
-	Command rmRole			 	 = Command("role delete",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_deleteRole);
-	Command pruneUsers			 = Command("prune",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_pruneUsers);
-	Command deleteInviteCode	 = Command("invite delete",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_deleteInvite);
-	Command deleteChannelInvites = Command("channel delete invites", this, Command::COMMAND_TYPE::ADMIN,&MyClientClass::fn_deleteChannelInvites);
-	Command deleteServerInvites	 = Command("invites delete all",this, Command::COMMAND_TYPE::ADMIN, 	&MyClientClass::fn_deleteAllInvites);
-	Command leave				 = Command("leave",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_leaveServer);
-	Command status				 = Command("status",			this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setStatus);
-	Command setBotActivity		 = Command("bot activity set",	this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setBotActivity);
-	Command setBotIdle			 = Command("bot idle set",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setBotIdle);
-	Command setBotStatus		 = Command("bot status set",	this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setBotStatus);
-	Command setBotAFK			 = Command("bot afk set",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setBotAFK);
+	// command object				  		name					client 	command type (admin or non-admin)	function pointer			noOwner
+	Command changePrefix 		 = Command("prefix",				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_changePrefix);
+	Command hello 				 = Command("hello",					this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_hello);
+	Command echo  				 = Command("echo",					this, Command::COMMAND_TYPE::NON_ADMIN, &MyClientClass::fn_echo);
+	Command dmUser  			 = Command("dm",					this, Command::COMMAND_TYPE::ADMIN, 	&MyClientClass::fn_dmUser);
+	Command muteVoice			 = Command("mute voice", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_muteVoice,	true);
+	Command unmuteVoice			 = Command("unmute voice", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unmuteVoice,	true);
+	Command muteText			 = Command("mute text", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_muteText,	true);
+	Command unmuteText			 = Command("unmute text", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unmuteText,	true);
+	Command kick				 = Command("kick", 					this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_kick,		true);
+	Command ban					 = Command("ban", 					this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_ban,			true);
+	Command unban				 = Command("unban", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_unban);
+	Command invite				 = Command("invite send", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_invite);
+	Command setBotAdminRole 	 = Command("bot_admin_role set",	this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_setBotAdminRole);
+	Command logsDisable			 = Command("logs disable", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_logsDisable);
+	Command logsEnable			 = Command("logs enable", 			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_logsDisable);
+	Command setLogsChannel		 = Command("logs", 					this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_setLogsChannel);
+	Command setSilent			 = Command("silent",				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_setSilent);
+	Command noSilent 			 = Command("nosilent", 				this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_logsDisable);
+	Command deleteMsg			 = Command("message delete",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_deleteMsg);
+	Command logAction			 = Command("log_action",			this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_logAction);
+	Command setPermissions		 = Command("permissions set",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setPermissions);
+	Command renameChannel		 = Command("channel rename",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setChannelName);
+	Command setChannelTopic		 = Command("channel topic set",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setChannelTopic);
+	Command removeChannel		 = Command("channel delete",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_deleteChannel);
+	Command pin					 = Command("pin",					this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_pinMessage);
+	Command unpin				 = Command("unpin",					this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_unpinMessage);
+	Command changeNickname		 = Command("nickname",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_changeNickname);
+	Command revokeRole			 = Command("role revoke",			this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_removeRole);
+	Command rmRole			 	 = Command("role delete",			this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_deleteRole);
+	Command pruneUsers			 = Command("prune",					this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_pruneUsers);
+	Command deleteInviteCode	 = Command("invite delete",			this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_deleteInvite);
+	Command deleteChannelInvites = Command("channel delete invites",this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_deleteChannelInvites);
+	Command deleteServerInvites	 = Command("invites delete all",	this, Command::COMMAND_TYPE::ADMIN, 	&MyClientClass::fn_deleteAllInvites);
+	Command leave				 = Command("leave",					this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_leaveServer);
+	Command status				 = Command("status",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setStatus);
+	Command setBotActivity		 = Command("bot activity set",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setBotActivity);
+	Command setBotIdle			 = Command("bot idle set",			this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setBotIdle);
+	Command setBotStatus		 = Command("bot status set",		this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setBotStatus);
+	Command setBotAFK			 = Command("bot afk set",			this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_setBotAFK);
 
-	Command die					 = Command("die",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_die);
-	Command bannedOps			 = Command("banned_ops",		this, Command::COMMAND_TYPE::NON_ADMIN,	&MyClientClass::fn_bannedOps);
-	Command sonarPing			 = Command("sonar_ping",		this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_sonarPing,	true);
-	Command fuckoff				 = Command("fuckoff",			this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_leaveServer);
+	Command die					 = Command("die",					this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_die);
+	Command bannedOps			 = Command("banned_ops",			this, Command::COMMAND_TYPE::NON_ADMIN,	&MyClientClass::fn_bannedOps);
+	Command sonarPing			 = Command("sonar_ping",			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_sonarPing,	true);
+	Command fuckoff				 = Command("fuckoff",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_leaveServer);
 
 	void init();
+	void readConfig();
+	void parseServers();
 
 	// client function overrides
 	void onMessage(SleepyDiscord::Message aMessage) override;
@@ -89,6 +91,8 @@ public:
 	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> s_ownerID = 518216114665291786;
 	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> s_botID   = 783177811950960670;
 
+	std::string m_config;
+
 	// std::string used in place of SleepyDiscord::Snowflake to prevent needing to supply a hash
 	std::unordered_map<std::string, SleepyDiscord::Server> m_servers;	// map server IDs to server objects
 	std::unordered_map<std::string, SleepyDiscord::Snowflake<SleepyDiscord::Channel>> m_userDMchannelIDs; // map server IDs to DM channel IDs
@@ -117,7 +121,7 @@ protected:
 	void fn_setLogsChannel		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
 	void fn_logsDisable			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, bool b = true);
 	void fn_setSilent			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, bool b = true);
-	void fn_deleteMsg			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, SleepyDiscord::Message& arMessage);
+	void fn_deleteMsg			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, SleepyDiscord::Message& arMessage);
 	void fn_logAction			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const std::string& acrString);
 	void fn_setPermissions		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, COMMAND_PERMISSION aCommandPerm, COMMAND_TYPE aCommandType);
 	//void fn_purgeMessages		(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, int aCount = 0);
@@ -145,13 +149,13 @@ protected:
 	void fn_bannedOps			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
 	void fn_sonarPing			(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrPingedUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, unsigned int aCount = 0);
 
-	static std::vector<std::string> split	(const std::string& acrString); // split string into vector of words
-	static std::string getSnowflake			(const std::string& acrString); // get ID from mention
-	static COMMAND_TYPE toCommandType		(const std::string& acrString); // map string to command type
-	static COMMAND_PERMISSION toCommandPerm	(const std::string& acrString); // map string to command perm
-	static SleepyDiscord::Status toStatus	(const std::string& acrString);
-	static bool isBot						(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);
-		   bool isMuted						(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) const;
+	static std::vector<std::string> split		 (const std::string& acrString); // split string into vector of words
+	static std::string				getSnowflake (const std::string& acrString); // get ID from mention
+	static COMMAND_TYPE				toCommandType(const std::string& acrString); // map string to command type
+	static COMMAND_PERMISSION		toCommandPerm(const std::string& acrString); // map string to command perm
+	static SleepyDiscord::Status	toStatus	 (const std::string& acrString); // map string to status
+	static bool						isBot		 (const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);
+		   bool						isMuted		 (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) const;
 };
 
 #endif
