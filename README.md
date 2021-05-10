@@ -14,17 +14,17 @@ Local variables are to be prefixed with 'l'
 
 Const variables are to be prefixed with 'c'
 
+References are to be prefixed with 'r'
+
 Pointers are to be prefixed with 'p'
 
 Double pointers are to be prefixed with "pp"
 
 Function pointers are to be prefixed with "fp"
 
-References are to be prefixed with 'r'
-
-Precedence follows the order listed above (i.e. [m\_|s\_|g\_][a|l][c][p|fp][r]
+Precedence follows the order listed above (i.e. [m\_|s\_|g\_|a|l][c][r][p|pp|fp]
 
 All functions and variables are to be in camelCase, excepting functions which may be ambiguous with variables, which may be prefixed with "fn\_"
 
-Classes and structs are to be in CapitalCase.
+Classes and structs are to be in PascalCase.
 Enums and enum entries are to be in ALL\_CAPS\_SNAKE\_CASE.
