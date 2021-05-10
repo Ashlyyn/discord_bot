@@ -63,8 +63,8 @@ public:
 	void readConfig();
 	void readServerInfo();
 	void parseServers();
-	void configAddServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
-	void configUpdateServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
+	void addServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
+	void updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
 
 	// client function overrides
 	void onMessage(SleepyDiscord::Message aMessage) override;

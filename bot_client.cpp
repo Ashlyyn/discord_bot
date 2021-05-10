@@ -84,7 +84,7 @@ void MyClientClass::parseServers() {
 	}
 }
 
-void MyClientClass::configAddServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+void MyClientClass::addServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
 	// read in m_serverInfoJSON
 	rapidjson::Document lDoc;
 	lDoc.Parse(m_serverInfoJSON.c_str());
@@ -128,7 +128,7 @@ void MyClientClass::configAddServer(const SleepyDiscord::Snowflake<SleepyDiscord
 	lConfigFile << lStringBuffer.GetString();
 }
 
-void MyClientClass::configUpdateServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+void MyClientClass::updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
 	// read in m_serverInfoJSON
 	rapidjson::Document lDoc;
 	lDoc.Parse(m_serverInfoJSON.c_str());
@@ -476,7 +476,7 @@ void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 		m_serverBotSettings.at(aServer.ID);
 	} catch(const std::out_of_range& e) {
 		m_serverBotSettings[aServer.ID] = ServerBotSettings();
-		configAddServer(aServer.ID);
+		addServerInfo(aServer.ID);
 	}
 }
 
@@ -539,7 +539,7 @@ void MyClientClass::fn_changePrefix(SleepyDiscord::Snowflake<SleepyDiscord::Serv
 		echo(arServerID, acrUser, acrChannelID, lcMessage);
 	}
 	m_serverBotSettings.at(arServerID).prefix = acrNewPrefix;
-	configUpdateServer(arServerID);
+	updateServerInfo(arServerID);
 }
 
 void MyClientClass::fn_hello(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
