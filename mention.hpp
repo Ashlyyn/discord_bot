@@ -21,7 +21,7 @@ public:
         return m_prefix + m_mention + ">";
     }
 
-    inline const std::string string()& const {
+    inline const std::string string() const {
         return m_prefix + m_mention + ">";
     }
 
