@@ -3,10 +3,10 @@
 
 void MyClientClass::init() {
 	try {
-		readConfig();
+		readServerInfo();
 	}
 	catch (const std::runtime_error& e) {
-		fprintf(stderr, "init(): %s\n", e.what());
+		std::fprintf(stderr, "init(): %s\n", e.what());
 		return;
 	}
 }
@@ -15,22 +15,29 @@ void MyClientClass::readConfig() {
 	std::ifstream lConfigFile("../config.json");
 	std::stringstream lSS;
 	lSS << lConfigFile.rdbuf();
-	m_config = lSS.str();
+	m_configJSON = lSS.str();
+}
+
+void MyClientClass::readServerInfo() {
+	std::ifstream lServerInfoFile("../server_info.json");
+	std::stringstream lSS;
+	lSS << lServerInfoFile.rdbuf();
+	m_serverInfoJSON = lSS.str();
 	try {
 		parseServers();
 	}
-	catch (const std::runtime_error& e) {
+	catch (const std::exception& e) {
 		throw std::runtime_error(std::string("readConfig(): ") + e.what());
 	}
 }
 
 void MyClientClass::parseServers() {
-	if (m_config.empty()) {
-		throw std::runtime_error("parseServers(): m_config empty.");
+	if (m_serverInfoJSON.empty()) {
+		throw std::runtime_error("parseServers(): m_serverInfoJSON empty.");
 	}
 
 	rapidjson::Document lDoc;
-	lDoc.Parse(m_config.c_str());
+	lDoc.Parse(m_serverInfoJSON.c_str());
 	if (lDoc.HasMember("serverInfo") == false) {
 		throw std::runtime_error("parseServers(): serverInfo not found.");
 	}
@@ -41,6 +48,7 @@ void MyClientClass::parseServers() {
 
 	for (rapidjson::Value::ConstMemberIterator itr = lServerInfoVal.MemberBegin(); itr != lServerInfoVal.MemberEnd(); ++itr) {
 		const std::string lcSnowflake = itr->name.GetString();
+		m_serverBotSettings[lcSnowflake] = ServerBotSettings();
 		std::array<const char*, 7> lKeys = {
 			"silent", "noLogs", "prefix", "logsChannelID", "botAdminRoleID", "mutedUserIDs", "permissions"
 		};
@@ -59,8 +67,8 @@ void MyClientClass::parseServers() {
 		m_serverBotSettings.at(lcSnowflake).silent			= itr->value["silent"].GetBool();
 		m_serverBotSettings.at(lcSnowflake).noLogs			= itr->value["noLogs"].GetBool();
 		m_serverBotSettings.at(lcSnowflake).prefix			= itr->value["prefix"].GetString();
-		m_serverBotSettings.at(lcSnowflake).permissions[0] = itr->value["permissions"].GetArray()[0].GetInt();
-		m_serverBotSettings.at(lcSnowflake).permissions[1] = itr->value["permissions"].GetArray()[1].GetInt();
+		m_serverBotSettings.at(lcSnowflake).permissions[0]	= itr->value["permissions"].GetArray()[0].GetInt();
+		m_serverBotSettings.at(lcSnowflake).permissions[1]	= itr->value["permissions"].GetArray()[1].GetInt();
 
 		if (!itr->value["logsChannelID"].IsNull()) {
 			m_serverBotSettings.at(lcSnowflake).logsChannelID = itr->value["logsChannelID"].GetString();
@@ -77,9 +85,9 @@ void MyClientClass::parseServers() {
 }
 
 void MyClientClass::configAddServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
-	// read in m_config
+	// read in m_serverInfoJSON
 	rapidjson::Document lDoc;
-	lDoc.Parse(m_config.c_str());
+	lDoc.Parse(m_serverInfoJSON.c_str());
 
 	// create empty array for mutedUserIDs field of serverInfo
 	rapidjson::Value lMutedUserIDsArrayVal;
@@ -112,18 +120,18 @@ void MyClientClass::configAddServer(const SleepyDiscord::Snowflake<SleepyDiscord
 	rapidjson::StringBuffer lStringBuffer;
 	rapidjson::Writer<rapidjson::StringBuffer> lWriter(lStringBuffer);
 	lDoc.Accept(lWriter);
-	// update m_config
-	m_config = lStringBuffer.GetString();
+	// update m_serverInfoJSON
+	m_serverInfoJSON = lStringBuffer.GetString();
 
 	// and write update config to disk
-	std::ofstream lConfigFile("../config.json", std::ofstream::trunc);
+	std::ofstream lConfigFile("../server_info.json", std::ofstream::trunc);
 	lConfigFile << lStringBuffer.GetString();
 }
 
 void MyClientClass::configUpdateServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
-	// read in m_config
+	// read in m_serverInfoJSON
 	rapidjson::Document lDoc;
-	lDoc.Parse(m_config.c_str());
+	lDoc.Parse(m_serverInfoJSON.c_str());
 
 	rapidjson::Value& lServerInfoVal = lDoc["serverInfo"];
 	rapidjson::Value lStringVal;
@@ -147,11 +155,11 @@ void MyClientClass::configUpdateServer(const SleepyDiscord::Snowflake<SleepyDisc
 	rapidjson::StringBuffer lStringBuffer;
 	rapidjson::Writer<rapidjson::StringBuffer> lWriter(lStringBuffer);
 	lDoc.Accept(lWriter);
-	// update m_config
-	m_config = lStringBuffer.GetString();
+	// update m_serverInfoJSON
+	m_serverInfoJSON = lStringBuffer.GetString();
 
 	// and write update config to disk
-	std::ofstream lConfigFile("../config.json", std::ofstream::trunc);
+	std::ofstream lConfigFile("../server_info.json", std::ofstream::trunc);
 	lConfigFile << lStringBuffer.GetString();
 }
 
@@ -467,7 +475,6 @@ void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 	try {
 		m_serverBotSettings.at(aServer.ID);
 	} catch(const std::out_of_range& e) {
-		std::fprintf(stderr, "%s\n", aServer.ID.string().c_str());
 		m_serverBotSettings[aServer.ID] = ServerBotSettings();
 		configAddServer(aServer.ID);
 	}

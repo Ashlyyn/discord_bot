@@ -61,6 +61,7 @@ public:
 
 	void init();
 	void readConfig();
+	void readServerInfo();
 	void parseServers();
 	void configAddServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
 	void configUpdateServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
@@ -93,7 +94,8 @@ public:
 	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> s_ownerID = 518216114665291786;
 	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> s_botID   = 783177811950960670;
 
-	std::string m_config;
+	std::string m_configJSON;
+	std::string m_serverInfoJSON;
 
 	// std::string used in place of SleepyDiscord::Snowflake to prevent needing to supply a hash
 	std::unordered_map<std::string, SleepyDiscord::Server> m_servers;	// map server IDs to server objects
