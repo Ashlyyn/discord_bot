@@ -2,7 +2,7 @@ Discord bot created in C++ with Sleepy Discord.
 
 Variable Naming Convention:
 
-Class members are to be prefixed with "m\_", excepting objects with an overloaded operator=() intended to be used like a function call
+Class members are to be prefixed with "m\_", excepting objects with an overloaded operator() intended to be used like a function call
 
 Static variables are to be prefixed with "s\_"
 
