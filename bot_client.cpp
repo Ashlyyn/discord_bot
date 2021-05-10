@@ -12,13 +12,43 @@ void MyClientClass::init() {
 }
 
 void MyClientClass::readConfig() {
+	if(!std::ifstream("../config.json")) {
+		std::fprintf(stderr, "readConfig(): config.json not found, exiting.\n");
+		std::exit(2);
+	}
 	std::ifstream lConfigFile("../config.json");
 	std::stringstream lSS;
 	lSS << lConfigFile.rdbuf();
+	if(lSS.str().empty()) {
+		std::fprintf(stderr, "readConfig(): config.json empty, exiting.\n");
+		std::exit(3);
+	}
 	m_configJSON = lSS.str();
 }
 
 void MyClientClass::readServerInfo() {
+	// if server_info.json doesn't exist, create and return early since it will have no data to be parsed
+	if(!std::ifstream("../server_info.json")) {
+		rapidjson::Document lDoc;
+		rapidjson::Value lStringVal;
+		rapidjson::Value lServerInfoVal;
+		lStringVal.SetString("bot");
+		lServerInfoVal.SetObject();
+		lDoc.AddMember("project", lStringVal, lDoc.GetAllocator());
+		lDoc.AddMember("serverInfo", lServerInfoVal, lDoc.GetAllocator());
+		
+		// stringify document
+		rapidjson::StringBuffer lStringBuffer;
+		rapidjson::Writer<rapidjson::StringBuffer> lWriter(lStringBuffer);
+		lDoc.Accept(lWriter);
+		// update m_serverInfoJSON
+		m_serverInfoJSON = lStringBuffer.GetString();
+
+		// and write update config to disk
+		std::ofstream lServerInfoFile("../server_info.json", std::ofstream::trunc);
+
+		return;
+	}
 	std::ifstream lServerInfoFile("../server_info.json");
 	std::stringstream lSS;
 	lSS << lServerInfoFile.rdbuf();
@@ -124,8 +154,11 @@ void MyClientClass::addServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::
 	m_serverInfoJSON = lStringBuffer.GetString();
 
 	// and write update config to disk
-	std::ofstream lConfigFile("../server_info.json", std::ofstream::trunc);
-	lConfigFile << lStringBuffer.GetString();
+	std::ofstream lServerInfoFile("../server_info.json", std::ofstream::trunc);
+	if(!lServerInfoFile) {
+		throw std::ios_base::failure("addServerInfo(): failed to open server_info.json");
+	}
+	lServerInfoFile << lStringBuffer.GetString();
 }
 
 void MyClientClass::updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
@@ -159,8 +192,11 @@ void MyClientClass::updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscor
 	m_serverInfoJSON = lStringBuffer.GetString();
 
 	// and write update config to disk
-	std::ofstream lConfigFile("../server_info.json", std::ofstream::trunc);
-	lConfigFile << lStringBuffer.GetString();
+	std::ofstream lServerInfoFile("../server_info.json", std::ofstream::trunc);
+	if(!lServerInfoFile) {
+		throw std::ios_base::failure("updateServerInfo(): failed to open server_info.json");
+	}
+	lServerInfoFile << lStringBuffer.GetString();
 }
 
 void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
@@ -476,7 +512,11 @@ void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 		m_serverBotSettings.at(aServer.ID);
 	} catch(const std::out_of_range& e) {
 		m_serverBotSettings[aServer.ID] = ServerBotSettings();
-		addServerInfo(aServer.ID);
+		try {
+			addServerInfo(aServer.ID);
+		} catch(const std::ios_base::failure& e) {
+			std::fprintf(stderr, "onServer(): %s", e.what());
+		}
 	}
 }
 
