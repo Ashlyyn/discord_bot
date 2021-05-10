@@ -4,7 +4,6 @@
 void MyClientClass::init() {
 	try {
 		readConfig();
-		configAddServer("000000000000000000");
 	}
 	catch (const std::runtime_error& e) {
 		fprintf(stderr, "init(): %s\n", e.what());
@@ -57,17 +56,22 @@ void MyClientClass::parseServers() {
 			itr->value["mutedUserIDs"][0].GetString(),	 itr->value["permissions"][0].GetInt(),	  itr->value["permissions"][1].GetInt()
 		);
 		*/
-		m_serverBotSettings[lcSnowflake].silent			= itr->value["silent"].GetBool();
-		m_serverBotSettings[lcSnowflake].noLogs			= itr->value["noLogs"].GetBool();
-		m_serverBotSettings[lcSnowflake].prefix			= itr->value["prefix"].GetString();
-		m_serverBotSettings[lcSnowflake].logsChannelID	= itr->value["logsChannelID"].GetString();
-		m_serverBotSettings[lcSnowflake].botAdminRoleID = itr->value["botAdminRoleID"].GetString();
-		m_serverBotSettings[lcSnowflake].permissions[0] = itr->value["permissions"].GetArray()[0].GetInt();
-		m_serverBotSettings[lcSnowflake].permissions[1] = itr->value["permissions"].GetArray()[1].GetInt();
+		m_serverBotSettings.at(lcSnowflake).silent			= itr->value["silent"].GetBool();
+		m_serverBotSettings.at(lcSnowflake).noLogs			= itr->value["noLogs"].GetBool();
+		m_serverBotSettings.at(lcSnowflake).prefix			= itr->value["prefix"].GetString();
+		m_serverBotSettings.at(lcSnowflake).permissions[0] = itr->value["permissions"].GetArray()[0].GetInt();
+		m_serverBotSettings.at(lcSnowflake).permissions[1] = itr->value["permissions"].GetArray()[1].GetInt();
 
-		m_serverBotSettings[lcSnowflake].mutedUserIDs.resize(itr->value["mutedUserIDs"].Size());
-		for (int i = 0; i < m_serverBotSettings[lcSnowflake].mutedUserIDs.size(); i++) {
-			m_serverBotSettings[lcSnowflake].mutedUserIDs[i] = itr->value["mutedUserIDs"].GetArray()[i].GetString();
+		if (!itr->value["logsChannelID"].IsNull()) {
+			m_serverBotSettings.at(lcSnowflake).logsChannelID = itr->value["logsChannelID"].GetString();
+		}
+		if (!itr->value["botAdminRoleID"].IsNull()) {
+			m_serverBotSettings.at(lcSnowflake).botAdminRoleID = itr->value["botAdminRoleID"].GetString();
+		}
+
+		m_serverBotSettings.at(lcSnowflake).mutedUserIDs.resize(itr->value["mutedUserIDs"].Size());
+		for (int i = 0; i < m_serverBotSettings.at(lcSnowflake).mutedUserIDs.size(); i++) {
+			m_serverBotSettings.at(lcSnowflake).mutedUserIDs[i] = itr->value["mutedUserIDs"].GetArray()[i].GetString();
 		}
 	}
 }
@@ -91,16 +95,53 @@ void MyClientClass::configAddServer(const SleepyDiscord::Snowflake<SleepyDiscord
 	// create new member for serverInfo, and intialize to defaults of serverBotSettings
 	rapidjson::Value lServerInfoVal;
 	lServerInfoVal.SetObject();
-	lServerInfoVal.AddMember("silent", 		   false,				 lDoc.GetAllocator());
-	lServerInfoVal.AddMember("noLogs", 		   false,				 lDoc.GetAllocator());
-	lServerInfoVal.AddMember("prefix", 		   "F!",  				 lDoc.GetAllocator());
-	lServerInfoVal.AddMember("logsChannelID",  rapidjson::kNullType, lDoc.GetAllocator());
-	lServerInfoVal.AddMember("botAdminRoleID", rapidjson::kNullType, lDoc.GetAllocator());
-	lServerInfoVal.AddMember("mutedUserIDs",   lMutedUserIDsArrayVal,lDoc.GetAllocator());
-	lServerInfoVal.AddMember("permissions",	   lPermissionsArrayVal, lDoc.GetAllocator());
+	lServerInfoVal.AddMember("silent", 		   false,				  lDoc.GetAllocator());
+	lServerInfoVal.AddMember("noLogs", 		   false,				  lDoc.GetAllocator());
+	lServerInfoVal.AddMember("prefix", 		   "F!",  				  lDoc.GetAllocator());
+	lServerInfoVal.AddMember("logsChannelID",  rapidjson::kNullType,  lDoc.GetAllocator());
+	lServerInfoVal.AddMember("botAdminRoleID", rapidjson::kNullType,  lDoc.GetAllocator());
+	lServerInfoVal.AddMember("mutedUserIDs",   lMutedUserIDsArrayVal, lDoc.GetAllocator());
+	lServerInfoVal.AddMember("permissions",	   lPermissionsArrayVal,  lDoc.GetAllocator());
 	
 	// add new member to serverInfo
-	lDoc["serverInfo"].AddMember("000000000000000000", lServerInfoVal, lDoc.GetAllocator());
+	rapidjson::Value lStringVal;	// make AddMember play nice with std::string
+	lStringVal.SetString(acrServerID.string().c_str(), acrServerID.string().size(), lDoc.GetAllocator());
+	lDoc["serverInfo"].AddMember(lStringVal, lServerInfoVal, lDoc.GetAllocator());
+
+	// stringify document
+	rapidjson::StringBuffer lStringBuffer;
+	rapidjson::Writer<rapidjson::StringBuffer> lWriter(lStringBuffer);
+	lDoc.Accept(lWriter);
+	// update m_config
+	m_config = lStringBuffer.GetString();
+
+	// and write update config to disk
+	std::ofstream lConfigFile("../config.json", std::ofstream::trunc);
+	lConfigFile << lStringBuffer.GetString();
+}
+
+void MyClientClass::configUpdateServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+	// read in m_config
+	rapidjson::Document lDoc;
+	lDoc.Parse(m_config.c_str());
+
+	rapidjson::Value& lServerInfoVal = lDoc["serverInfo"];
+	rapidjson::Value lStringVal;
+	lStringVal.SetString(acrServerID.string().c_str(), acrServerID.string().size(), lDoc.GetAllocator());
+	rapidjson::Value::MemberIterator itr = lServerInfoVal.FindMember(lStringVal);
+
+	itr->value["silent"].SetBool(m_serverBotSettings.at(acrServerID).silent);
+	itr->value["noLogs"].SetBool(m_serverBotSettings.at(acrServerID).noLogs);
+	itr->value["prefix"].SetString(rapidjson::StringRef(m_serverBotSettings.at(acrServerID).prefix.c_str()));
+	itr->value["logsChannelID"].SetString(rapidjson::StringRef(m_serverBotSettings.at(acrServerID).logsChannelID.string().c_str()));
+	itr->value["botAdminRoleID"].SetString(rapidjson::StringRef(m_serverBotSettings.at(acrServerID).botAdminRoleID.string().c_str()));
+	itr->value["permissions"].GetArray()[0].SetInt(m_serverBotSettings.at(acrServerID).permissions[0]);
+	itr->value["permissions"].GetArray()[1].SetInt(m_serverBotSettings.at(acrServerID).permissions[1]);
+
+	itr->value["mutedUserIDs"].Clear();
+	for (int i = 0; i < m_serverBotSettings.at(acrServerID).mutedUserIDs.size(); i++) {
+		itr->value["mutedUserIDs"].PushBack(rapidjson::StringRef(m_serverBotSettings.at(acrServerID).mutedUserIDs[i].string().c_str()), lDoc.GetAllocator());
+	}
 
 	// stringify document
 	rapidjson::StringBuffer lStringBuffer;
@@ -425,7 +466,8 @@ void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 	m_servers[aServer.ID] = aServer;
 	try {
 		m_serverBotSettings.at(aServer.ID);
-	} catch(std::out_of_range) {
+	} catch(const std::out_of_range& e) {
+		std::fprintf(stderr, "%s\n", aServer.ID.string().c_str());
 		m_serverBotSettings[aServer.ID] = ServerBotSettings();
 		configAddServer(aServer.ID);
 	}
@@ -490,6 +532,7 @@ void MyClientClass::fn_changePrefix(SleepyDiscord::Snowflake<SleepyDiscord::Serv
 		echo(arServerID, acrUser, acrChannelID, lcMessage);
 	}
 	m_serverBotSettings.at(arServerID).prefix = acrNewPrefix;
+	configUpdateServer(arServerID);
 }
 
 void MyClientClass::fn_hello(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
