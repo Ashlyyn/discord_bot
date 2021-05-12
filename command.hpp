@@ -37,7 +37,7 @@ public:
         m_numParams = -1;
     }
     
-    template<typename ...Args> Command(const std::string& acrName, MyClientClass* apClient, COMMAND_TYPE aCommandType, void(MyClientClass::*fpFnptr)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...), bool b = false) {
+    template<typename ...Args> Command(const std::string& acrName, MyClientClass* apClient, COMMAND_TYPE aCommandType, void(MyClientClass::*fpFnptr)(const SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...), bool b = false) {
         m_name = acrName;
         if(m_client == nullptr) {
             m_client = apClient;
@@ -48,8 +48,8 @@ public:
         m_numParams = sizeof...(Args);
     }
 
-    template<typename ...Args> void operator()(SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::User& acrUser, Args... args) {
-        if(arServerID == SleepyDiscord::Snowflake<SleepyDiscord::Server>()) {
+    template<typename ...Args> void operator()(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, Args... args) {
+        if(acrServerID == SleepyDiscord::Snowflake<SleepyDiscord::Server>()) {
             throw std::runtime_error("Command::operator(): Null server passed to function.");
         }
         else if (acrUser == SleepyDiscord::User()) {
@@ -58,10 +58,10 @@ public:
         
         else {
             // check if user is allowed to execute command; logAction() is excepted, since no user will ever call it
-            if((checkPermissions(arServerID, acrUser) == true) || (m_name == "log_action")) {
+            if((checkPermissions(acrServerID, acrUser) == true) || (m_name == "log_action")) {
                 // server and user must be passed to all functions, even those that do not use them directly
                 // to allow for permission checking
-                (m_client->*(void(MyClientClass::*)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(arServerID, acrUser, args...);
+                (m_client->*(void(MyClientClass::*)(const SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...))m_fpRun)(acrServerID, acrUser, args...);
             }
         }
     }
