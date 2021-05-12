@@ -1010,7 +1010,7 @@ MyClientClass::COMMAND_PERMISSION MyClientClass::toCommandPerm(const std::string
     catch(std::out_of_range& e) {
 		std::string lError = "toCommandPerm(): invalid string provided (" + acrString + ")";
 		throw std::runtime_error(lError);
-		return COMMAND_PERMISSION::ERR;
+		return COMMAND_PERMISSION::PERM_ERR;
 	}
 	return lPerm;
 }
@@ -1027,7 +1027,7 @@ MyClientClass::COMMAND_TYPE MyClientClass::toCommandType(const std::string& acrS
     } catch(std::out_of_range& e) {
         std::string lError = "toCommandType(): invalid string provided (" + acrString + ")";
 		throw std::runtime_error(lError);
-		return COMMAND_TYPE::ERR;
+		return COMMAND_TYPE::TYPE_ERR;
 	}
 	return lType;
 }
@@ -1053,19 +1053,34 @@ SleepyDiscord::Status MyClientClass::toStatus(const std::string& acrString) {
 	return lStatus;
 }
 
-bool MyClientClass::isBot(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
-	return acrUserID == s_botID;
+bool MyClientClass::hasRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
+	SleepyDiscord::Server lServer = getServer(acrServerID);
+	const SleepyDiscord::ServerMember& lcrMember = *lServer.findMember(acrUserID);
+	for (const auto& lMemberRoleID : lcrMember.roles) {
+	    if (lMemberRoleID == acrRoleID) {
+            return true;
+		}
+	}
+	return false;
+}
+
+bool MyClientClass::hasPermission(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Permission acPermission) {
+	SleepyDiscord::Server lServer = getServer(acrServerID);
+	const SleepyDiscord::ServerMember lcMember = getMember(acrServerID, acrUserID);
+	std::vector<SleepyDiscord::Role> lcRoles = getRoles(acrServerID);
+	for(const SleepyDiscord::Role& lcRole : lcRoles) {
+		if(hasRole(acrServerID, acrUserID, lcRole.ID)) {
+			if(lcRole.permissions & acPermission) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 bool MyClientClass::isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) const {
 	std::mutex mutex;
+	std::lock_guard lock(mutex);
 
-	mutex.lock();
-	if(std::count(m_serverBotSettings.at(acrServerID).mutedUserIDs.begin(), m_serverBotSettings.at(acrServerID).mutedUserIDs.end(), acrUserID) >= 1) {
-		mutex.unlock();
-		return true;
-	} else {
-		mutex.unlock();
-		return false;
-	}
+	return std::count(m_serverBotSettings.at(acrServerID).mutedUserIDs.begin(), m_serverBotSettings.at(acrServerID).mutedUserIDs.end(), acrUserID) >= 1;
 }
