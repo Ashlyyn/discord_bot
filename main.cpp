@@ -15,11 +15,11 @@ int main() {
 			client.run();
 		}
 		catch (std::runtime_error& e) {
-			std::fprintf(stderr, "%s\n", e.what());
+			std::fprintf(stderr, "main(): uncaught exception: %s\n", e.what());
 			return 1;
 		}
 	}
 	catch (...) {
-		std::fprintf(stderr, "%s\n", lToken.GetString());
+		std::fprintf(stderr, "main(): error running bot: %s\n", lToken.GetString());
 	}
 }
