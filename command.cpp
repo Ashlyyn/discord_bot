@@ -25,7 +25,9 @@ bool Command::hasRole(SleepyDiscord::Server& arServer, const SleepyDiscord::Snow
 bool Command::checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser) const {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
-	
+
+	assert(m_client->m_serverBotSettings.at(acrServerID).permissions[m_commandType] != MyClientClass::COMMAND_PERMISSION::ERR);
+
 	// if server's permissions for command's command type is owner only and user is owner
 	if(m_client->m_serverBotSettings.at(acrServerID).permissions[m_commandType] == MyClientClass::COMMAND_PERMISSION::OWNER_ONLY && isOwner(acrUser.ID)) {
     	return true;
