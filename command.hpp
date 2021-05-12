@@ -36,11 +36,12 @@ public:
         m_noOwner = false;
         m_numParams = -1;
     }
-
     
     template<typename ...Args> Command(const std::string& acrName, MyClientClass* apClient, COMMAND_TYPE aCommandType, void(MyClientClass::*fpFnptr)(SleepyDiscord::Snowflake<SleepyDiscord::Server>&, const SleepyDiscord::User&, Args...), bool b = false) {
         m_name = acrName;
-        m_client = apClient;
+        if(m_client == nullptr) {
+            m_client = apClient;
+        }
         m_fpRun = (void(MyClientClass::*)(void)) fpFnptr; // cast to void(*)(void) to allow assignment to m_fpRun
         m_commandType = aCommandType;
         m_noOwner = b;
@@ -70,7 +71,7 @@ public:
     }
 
 private:
-    MyClientClass* m_client;
+    inline static MyClientClass* m_client = nullptr;
     void (MyClientClass::*m_fpRun)();
     std::string m_name; // name of command as used by bot
     COMMAND_TYPE m_commandType;
@@ -80,8 +81,6 @@ private:
     // permissions for each server
     std::unordered_map<std::string, COMMAND_TYPE> m_permissions;
 
-    static bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);
-    static bool hasRole(SleepyDiscord::Server& arServer, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID);
     bool checkPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser) const;
 };
 
