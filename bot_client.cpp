@@ -14,6 +14,7 @@ void MyClientClass::init() {
 void MyClientClass::readConfig() {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
+
 	if(!std::ifstream("../config.json")) {
 		std::fprintf(stderr, "readConfig(): config.json not found or failed to open, exiting.\n");
 		std::exit(2);
@@ -70,6 +71,7 @@ void MyClientClass::readServerInfo() {
 void MyClientClass::parseServers() {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
+
 	if (m_serverInfoJSON.empty()) {
 		throw std::runtime_error("parseServers(): m_serverInfoJSON empty.");
 	}
@@ -535,6 +537,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 	std::mutex mutex;
 	mutex.lock();
+	
 	m_servers[aServer.ID] = aServer;
 	try {
 		// if std::map::at throws std::out_of_range, entry doesn't exist
@@ -547,6 +550,8 @@ void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 			addServerInfo(aServer.ID);
 		} catch(const std::ios_base::failure& e) {
 			std::fprintf(stderr, "onServer(): %s", e.what());
+			mutex.unlock();
+			return;
 		}
 		mutex.unlock();
 		return;
@@ -1005,6 +1010,7 @@ MyClientClass::COMMAND_PERMISSION MyClientClass::toCommandPerm(const std::string
     catch(std::out_of_range& e) {
 		std::string lError = "toCommandPerm(): invalid string provided (" + acrString + ")";
 		throw std::runtime_error(lError);
+		return COMMAND_PERMISSION::ERR;
 	}
 	return lPerm;
 }
@@ -1021,6 +1027,7 @@ MyClientClass::COMMAND_TYPE MyClientClass::toCommandType(const std::string& acrS
     } catch(std::out_of_range& e) {
         std::string lError = "toCommandType(): invalid string provided (" + acrString + ")";
 		throw std::runtime_error(lError);
+		return COMMAND_TYPE::ERR;
 	}
 	return lType;
 }
@@ -1041,6 +1048,7 @@ SleepyDiscord::Status MyClientClass::toStatus(const std::string& acrString) {
 	} catch (const std::out_of_range& e) {
 		std::string lError = "toStatus(): invalid string provided (" + acrString + ")";
 		throw std::runtime_error(lError);
+		return SleepyDiscord::Status();
 	}
 	return lStatus;
 }
