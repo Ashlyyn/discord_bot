@@ -8,6 +8,7 @@
 
 #include "command.hpp"
 #include "server_bot_settings.hpp"
+#include "constants.hpp"
 
 class MyClientClass : public SleepyDiscord::DiscordClient {
 public:
@@ -93,8 +94,8 @@ public:
 		bool AFK = false;
 	} botStatus;
 
-	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> s_ownerID = 518216114665291786;
-	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> s_botID   = 783177811950960670;
+	inline static const SleepyDiscord::Snowflake<SleepyDiscord::User> s_ownerID = _C_BOT_OWNER_ID;
+	inline static const SleepyDiscord::Snowflake<SleepyDiscord::User> s_botID   = _C_BOT_ID;
 
 	std::string m_configJSON;
 	std::string m_serverInfoJSON;

@@ -7,12 +7,14 @@
 
 #include "sleepy_discord/sleepy_discord.h"
 
+#include "constants.hpp"
+
 // struct to hold per-server info for the bot
 // used in client's m_serverBotSettings map
 struct ServerBotSettings {
     bool silent = false; // don't send any messages
     bool noLogs = false; // don't log anything
-	std::string prefix = "F!";
+	std::string prefix = _C_DEFAULT_BOT_PREFIX;
 	SleepyDiscord::Snowflake<SleepyDiscord::Channel> logsChannelID; // channel for logs - set with setLogsChannel()/F!logs <channelID>
 	SleepyDiscord::Snowflake<SleepyDiscord::Role> botAdminRoleID; // ID of role that allows user to execute admin commands
 	std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User>> mutedUserIDs; // IDs of users text muted

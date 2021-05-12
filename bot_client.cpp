@@ -148,7 +148,7 @@ void MyClientClass::addServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::
 	lServerInfoVal.SetObject();
 	lServerInfoVal.AddMember("silent", 		   false,				  lDoc.GetAllocator());
 	lServerInfoVal.AddMember("noLogs", 		   false,				  lDoc.GetAllocator());
-	lServerInfoVal.AddMember("prefix", 		   "F!",  				  lDoc.GetAllocator());
+	lServerInfoVal.AddMember("prefix", 		   _C_DEFAULT_BOT_PREFIX, lDoc.GetAllocator());
 	lServerInfoVal.AddMember("logsChannelID",  rapidjson::kNullType,  lDoc.GetAllocator());
 	lServerInfoVal.AddMember("botAdminRoleID", rapidjson::kNullType,  lDoc.GetAllocator());
 	lServerInfoVal.AddMember("mutedUserIDs",   lMutedUserIDsArrayVal, lDoc.GetAllocator());
@@ -537,7 +537,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 	std::mutex mutex;
 	mutex.lock();
-	
+
 	m_servers[aServer.ID] = aServer;
 	try {
 		// if std::map::at throws std::out_of_range, entry doesn't exist
@@ -966,9 +966,9 @@ void MyClientClass::fn_sonarPing(SleepyDiscord::Snowflake<SleepyDiscord::Server>
 		std::string lMention = Mention<SleepyDiscord::User>(acrPingedUserID);
 		for(int i = 0; i < aCount; i++) {
 			echo(arServerID, acrUser, acrChannelID, lMention + " Sonar ping.");
-			sleep(500);
+			sleep(_C_SONAR_PING_DELAY);
 			echo(arServerID, acrUser, acrChannelID, lMention + " Sonar pong.");
-			sleep(2000);
+			sleep(_C_SONAR_PONG_DELAY);
 		}
 	}
 }
