@@ -248,7 +248,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
                 const std::string lcError = std::string("mute text: ") + e.what();
 			    throw std::runtime_error(lcError);
 		    }
-		    muteText(aMessage.serverID, aMessage.author, getSnowflake(aMessage.content.substr(lcrPrefix.size() + muteText.name().size() + 1)));
+		    muteText(aMessage.serverID, aMessage.author, lSnowflake);
 	    } else if (aMessage.startsWith(lcrPrefix + "unmute text ")) {
 		    std::string lSnowflake;
 		    try {
@@ -257,7 +257,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
                 const std::string lcError = std::string("unmute text: ") + e.what();
 		    	throw std::runtime_error(lcError);
 		    }
-		    unmuteText(aMessage.serverID, aMessage.author, getSnowflake(aMessage.content.substr(lcrPrefix.size() + unmuteText.name().size() + 1)));
+		    unmuteText(aMessage.serverID, aMessage.author, lSnowflake);
     	} else if (aMessage.startsWith(lcrPrefix + "kick ")) {
     		std::string lSnowflake;
 	    	try {
@@ -342,7 +342,15 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
     	} else if (aMessage.startsWith(lcrPrefix + "delete ")) {
 	    	deleteMsg(aMessage.serverID, aMessage.author, aMessage);
     	} else if (aMessage.startsWith(lcrPrefix + "permissions set ")) {
-	    	setPermissions(aMessage.serverID, aMessage.author, toCommandPerm(split(aMessage.content)[3]), toCommandType(split(aMessage.content)[2]));
+			COMMAND_PERMISSION lCommandPerm;
+			COMMAND_TYPE lCommandType;
+			try {
+				lCommandPerm = toCommandPerm(lcWords[3]);
+				lCommandType = toCommandType(lcWords[2]);
+			} catch(const std::exception& e) {
+				throw std::runtime_error(std::string("onMessage(): permissions_set: ") + e.what());
+			}
+	    	setPermissions(aMessage.serverID, aMessage.author, lCommandPerm, lCommandType);
 	    } else if (aMessage.startsWith(lcrPrefix + "channel rename ")) {
 		    std::string lSnowflake;
 		    try {
@@ -407,7 +415,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 	    } else if (aMessage.startsWith(lcrPrefix + "prune ")) {
 		    int lNumDays;
     		try {
-	    		lNumDays = std::stoi(split(aMessage.content)[1]);
+	    		lNumDays = std::stoi(lcWords[1]);
     		} catch(std::out_of_range& e) {
 	    		fprintf(stderr, "onMessage(): prune provided with out of range value.\n");
 		    	lNumDays = 0;
@@ -492,7 +500,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
     	} else if (aMessage.startsWith(lcrPrefix + "sonar_ping")) {
 	    	int lNumPings;
 		    try {
-			    lNumPings = stoi(split(aMessage.content)[2]);
+			    lNumPings = stoi(lcWords[2]);
     		} catch(const std::out_of_range& e) {
 		    	echo(aMessage.serverID, aMessage.author, aMessage.channelID, "Value is too large, must be less than 2^32.");
                 const std::string lcError = "sonar_ping: provided with out of range value for lNumPings.";
