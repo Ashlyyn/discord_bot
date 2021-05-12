@@ -73,12 +73,14 @@ public:
 	void onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aRemovedUser) override;
 
     enum COMMAND_PERMISSION {
+		ERR = -1,
 		OWNER_ONLY,
 		BOT_ADMIN,
 		CMD_ALL
 	};
 
 	enum COMMAND_TYPE {
+		ERR = -1,
 		ADMIN,
 		NON_ADMIN,
 		ROLE_ALL
