@@ -73,15 +73,23 @@ public:
 	void onBan(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUser) override;
 	void onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aRemovedUser) override;
 
+	// helper functions
+	bool hasRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID);
+	
+	inline static bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
+		return acrUserID == s_ownerID;
+	}
+	
+
     enum COMMAND_PERMISSION {
-		ERR = -1,
+		PERM_ERR = -1,
 		OWNER_ONLY,
 		BOT_ADMIN,
 		CMD_ALL
 	};
 
 	enum COMMAND_TYPE {
-		ERR = -1,
+		TYPE_ERR = -1,
 		ADMIN,
 		NON_ADMIN,
 		ROLE_ALL
@@ -161,8 +169,12 @@ protected:
 	static COMMAND_TYPE				toCommandType(const std::string& acrString); // map string to command type
 	static COMMAND_PERMISSION		toCommandPerm(const std::string& acrString); // map string to command perm
 	static SleepyDiscord::Status	toStatus	 (const std::string& acrString); // map string to status
-	static bool						isBot		 (const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID);
-		   bool						isMuted		 (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) const;
+		  		  bool 				hasPermission(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Permission acPermission);
+		   		  bool				isMuted		 (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& arServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) const;
+
+	inline static bool 				isBot(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
+		return acrUserID == s_botID;
+	}
 };
 
 #endif
