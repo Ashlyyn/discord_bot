@@ -9,6 +9,7 @@
 #include "command.hpp"
 #include "server_bot_settings.hpp"
 #include "constants.hpp"
+#include "server_cache.hpp"
 
 class MyClientClass : public SleepyDiscord::DiscordClient {
 public:
@@ -102,6 +103,8 @@ public:
 		bool AFK = false;
 	} botStatus;
 
+	inline static ServerCache m_cache = ServerCache();
+
 	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> s_botID	  = SleepyDiscord::Snowflake<SleepyDiscord::User>();
 	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> s_ownerID = SleepyDiscord::Snowflake<SleepyDiscord::User>();
 
@@ -109,7 +112,6 @@ public:
 	std::string m_serverInfoJSON;
 
 	// std::string used in place of SleepyDiscord::Snowflake to prevent needing to supply a hash
-	std::unordered_map<std::string, SleepyDiscord::Server> m_servers;	// map server IDs to server objects
 	std::unordered_map<std::string, SleepyDiscord::Snowflake<SleepyDiscord::Channel>> m_userDMchannelIDs; // map server IDs to DM channel IDs
 	std::unordered_map<std::string, ServerBotSettings> m_serverBotSettings; // map server IDs to their respective settings struct
 	std::unordered_map<std::string, std::pair<SleepyDiscord::User, bool>> m_bannedUsers; // map server IDs to users banned from servers 
