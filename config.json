@@ -1,5 +1,6 @@
 {
   "project": "bot",
   "token": "YOUR_BOT'S_TOKEN_HERE",
+  "ownerID": "YOUR_DISCORD_ACCOUNT'S_ID_HERE",
   "serverInfo": {}
 }
