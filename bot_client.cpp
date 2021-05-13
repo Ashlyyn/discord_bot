@@ -2,8 +2,8 @@
 #include "mention.hpp"
 
 void MyClientClass::init() {
-	s_botID = getID();
 	try {
+		s_botID = getID();
 		readServerInfo();
 	}
 	
@@ -615,12 +615,12 @@ void MyClientClass::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Serve
 
 
 
-void MyClientClass::fn_changePrefix(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrNewPrefix) {
+void MyClientClass::fn_changePrefix(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrNewPrefix) {
 	std::mutex mutex;
 	
 	if(acrNewPrefix.find(" ") != std::string::npos) {
 		const std::string lcMessage = "Prefix may not contain whitespace.";
-		echo(acrServerID, acrUser, acrChannelID, lcMessage);
+		echo(acrServerID, acrUserID, acrChannelID, lcMessage);
 	}
 	mutex.lock();
 	m_serverBotSettings.at(acrServerID).prefix = acrNewPrefix;
@@ -628,11 +628,11 @@ void MyClientClass::fn_changePrefix(const SleepyDiscord::Snowflake<SleepyDiscord
 	updateServerInfo(acrServerID);
 }
 
-void MyClientClass::fn_hello(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
-	echo(acrServerID, acrUser, acrChannelID, "Hello, " + Mention<SleepyDiscord::User>(acrUser));
+void MyClientClass::fn_hello(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+	echo(acrServerID, acrUserID, acrChannelID, "Hello, " + Mention<SleepyDiscord::User>(acrUserID));
 }
 
-void MyClientClass::fn_echo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrMessage) {
+void MyClientClass::fn_echo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrMessage) {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
 
@@ -641,7 +641,7 @@ void MyClientClass::fn_echo(const SleepyDiscord::Snowflake<SleepyDiscord::Server
 	}
 }
 
-void MyClientClass::fn_dmUser(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrDMedUserID, const std::string& acrMessage) {
+void MyClientClass::fn_dmUser(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrDMedUserID, const std::string& acrMessage) {
 	std::mutex mutex;
 	mutex.lock();
 
@@ -654,15 +654,15 @@ void MyClientClass::fn_dmUser(const SleepyDiscord::Snowflake<SleepyDiscord::Serv
 	sendMessage(lcChannelID, acrMessage);
 }
 
-void MyClientClass::fn_muteVoice(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrMutedUserID) {
+void MyClientClass::fn_muteVoice(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrMutedUserID) {
 	muteServerMember(acrServerID, acrMutedUserID, true);
 }
 
-void MyClientClass::fn_unmuteVoice(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrMutedUserID) {
+void MyClientClass::fn_unmuteVoice(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrMutedUserID) {
 	muteServerMember(acrServerID, acrMutedUserID, false);
 }
 
-void MyClientClass::fn_muteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrMutedUserID) {
+void MyClientClass::fn_muteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrMutedUserID) {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
 
@@ -671,7 +671,7 @@ void MyClientClass::fn_muteText(const SleepyDiscord::Snowflake<SleepyDiscord::Se
 	}
 }
 
-void MyClientClass::fn_unmuteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrMutedUserID) {
+void MyClientClass::fn_unmuteText(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrMutedUserID) {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
 
@@ -680,7 +680,7 @@ void MyClientClass::fn_unmuteText(const SleepyDiscord::Snowflake<SleepyDiscord::
 	}
 }
 
-void MyClientClass::fn_kick(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrKickedUserID, const std::string& acrReason) {
+void MyClientClass::fn_kick(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrKickedUserID, const std::string& acrReason) {
 	std::mutex mutex;
 
 	SleepyDiscord::User lKickedUser = getUser(acrKickedUserID);
@@ -694,15 +694,17 @@ void MyClientClass::fn_kick(const SleepyDiscord::Snowflake<SleepyDiscord::Server
 	lTimeSS << lTime;
 	const std::string lcTimeStr = lTimeSS.str(); // hacky time_t thing again
 	std::string lLog;
+
+	SleepyDiscord::User lUser = getUser(acrUserID);
 	if(acrReason == "") {
-		lLog = std::string("**KICKED USER**\n```User: " + lKickedUser.username + "#" + lKickedUser.discriminator + "\nBanned by: " + acrUser.username + "#" + acrUser.discriminator + "\nReason given:\nOn: " + lcTimeStr + "```");
+		lLog = std::string("**KICKED USER**\n```User: " + lKickedUser.username + "#" + lKickedUser.discriminator + "\nBanned by: " + lUser.username + "#" + lUser.discriminator + "\nReason given:\nOn: " + lcTimeStr + "```");
 	} else {
-		lLog = std::string("**KICKED USER**\n```User: " + lKickedUser.username + "#" + lKickedUser.discriminator + "\nBanned by: " + acrUser.username + "#" + acrUser.discriminator + "\nReason given: " + acrReason + "\nOn: " + lcTimeStr + "```");
+		lLog = std::string("**KICKED USER**\n```User: " + lKickedUser.username + "#" + lKickedUser.discriminator + "\nBanned by: " + lUser.username + "#" + lUser.discriminator + "\nReason given: " + acrReason + "\nOn: " + lcTimeStr + "```");
 	}
-	logAction(acrServerID, acrUser, lLog);
+	logAction(acrServerID, acrUserID, lLog);
 }
 
-void MyClientClass::fn_ban(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrBannedUserID, const std::string& acrReason, int acDeleteMessageDays) {
+void MyClientClass::fn_ban(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrBannedUserID, const std::string& acrReason, int acDeleteMessageDays) {
 	std::mutex mutex;
 	std::lock_guard<std::mutex> lock(mutex);
 
@@ -715,15 +717,17 @@ void MyClientClass::fn_ban(const SleepyDiscord::Snowflake<SleepyDiscord::Server>
 	lTimeSS << lTime;
 	const std::string lcTimeStr = lTimeSS.str(); // hacky time thing yet again
 	std::string lLog;
+
+	SleepyDiscord::User lUser = getUser(acrUserID);
 	if(acrReason == "") {
-		lLog = std::string("**BANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nBanned by: " + acrUser.username + "#" + acrUser.discriminator + "\nReason given:\nOn: " + lcTimeStr + "```");
+		lLog = std::string("**BANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nBanned by: " + lUser.username + "#" + lUser.discriminator + "\nReason given:\nOn: " + lcTimeStr + "```");
 	} else {
-		lLog = std::string("**BANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nBanned by: " + acrUser.username + "#" + acrUser.discriminator + "\nReason given: " + acrReason + "\nOn: " + lcTimeStr + "```");
+		lLog = std::string("**BANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nBanned by: " + lUser.username + "#" + lUser.discriminator + "\nReason given: " + acrReason + "\nOn: " + lcTimeStr + "```");
 	}
-	logAction(acrServerID, acrUser, lLog);
+	logAction(acrServerID, acrUserID, lLog);
 }
 
-void MyClientClass::fn_unban(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrBannedUserID, const std::string& acrReason) {
+void MyClientClass::fn_unban(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrBannedUserID, const std::string& acrReason) {
 	auto lBannedUsers = getBans(acrServerID).vector();
 	SleepyDiscord::User lBannedUser;
 
@@ -735,7 +739,7 @@ void MyClientClass::fn_unban(const SleepyDiscord::Snowflake<SleepyDiscord::Serve
 
 	if(lBannedUser.ID == "") {
 		const std::string lcLog = "User not found.";
-		echo(acrServerID, acrUser, acrChannelID, lcLog);
+		echo(acrServerID, acrUserID, acrChannelID, lcLog);
 		return;
 	} else {
 		std::mutex mutex;
@@ -750,66 +754,70 @@ void MyClientClass::fn_unban(const SleepyDiscord::Snowflake<SleepyDiscord::Serve
 		lTimeSS << lTime;
 		const std::string lcTimeStr = lTimeSS.str(); // once more...
 		std::string lLog;
+
+		SleepyDiscord::User lUser;
 		if(acrReason == "") {
-			lLog = std::string("**UNBANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nUnbanned by: " + acrUser.username + "#" + acrUser.discriminator + "\nReason given:\nOn: " + lcTimeStr + "```");
+			lLog = std::string("**UNBANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nUnbanned by: " + lUser.username + "#" + lUser.discriminator + "\nReason given:\nOn: " + lcTimeStr + "```");
 		} else {
-			lLog = std::string("**UNBANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nUnbanned by: " + acrUser.username + "#" + acrUser.discriminator + "\nReason given: " + acrReason + "\nOn: " + lcTimeStr + "```");
+			lLog = std::string("**UNBANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nUnbanned by: " + lUser.username + "#" + lUser.discriminator + "\nReason given: " + acrReason + "\nOn: " + lcTimeStr + "```");
 		}
-		logAction(acrServerID, acrUser, lLog);
+		logAction(acrServerID, acrUserID, lLog);
 	}
 }
 
-void MyClientClass::fn_invite(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrInvitedUserID) {
+void MyClientClass::fn_invite(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrInvitedUserID) {
 	SleepyDiscord::Invite invite = createChannelInvite(acrChannelID, 0, 1, false, false);
 	const std::string lcInviteCode = invite.code;
-	dmUser(acrServerID, acrUser, acrInvitedUserID, "https://discord.gg/" + lcInviteCode);
+	dmUser(acrServerID, acrUserID, acrInvitedUserID, "https://discord.gg/" + lcInviteCode);
 }
 
-void MyClientClass::fn_setBotAdminRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
+void MyClientClass::fn_setBotAdminRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
 	std::mutex mutex;
 
 	mutex.lock();
 	m_serverBotSettings.at(acrServerID).botAdminRoleID = acrRoleID;
 	mutex.unlock();
 
-	logAction(acrServerID, acrUser, "**BOT ADMIN ROLE SET**\n```Set to: " + acrRoleID.string() + "\nSet by: " + acrUser.username + "#" + acrUser.discriminator + "\n```");
+	SleepyDiscord::User lUser = getUser(acrUserID);
+	logAction(acrServerID, acrUserID, "**BOT ADMIN ROLE SET**\n```Set to: " + acrRoleID.string() + "\nSet by: " + lUser.username + "#" + lUser.discriminator + "\n```");
 }
 
-void MyClientClass::fn_setLogsChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+void MyClientClass::fn_setLogsChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
 	std::mutex mutex;
 
 	mutex.lock();
 	m_serverBotSettings.at(acrServerID).logsChannelID = acrChannelID;
 	mutex.unlock();
 
-	logAction(acrServerID, acrUser, "Logs enabled in " + Mention<SleepyDiscord::Snowflake<SleepyDiscord::Channel>>(acrChannelID));
+	logAction(acrServerID, acrUserID, "Logs enabled in " + Mention<SleepyDiscord::Snowflake<SleepyDiscord::Channel>>(acrChannelID));
 }
 
-void MyClientClass::fn_logsDisable(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, bool b) {
+void MyClientClass::fn_logsDisable(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, bool b) {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
 	m_serverBotSettings.at(acrServerID).noLogs = b;
 }
 
-void MyClientClass::fn_setSilent(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, bool b) {
+void MyClientClass::fn_setSilent(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, bool b) {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
 	m_serverBotSettings.at(acrServerID).silent = b;
 }
 
-void MyClientClass::fn_deleteMsg(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, SleepyDiscord::Message& arMessage) {
+void MyClientClass::fn_deleteMsg(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, SleepyDiscord::Message& arMessage) {
 	deleteMessage(acrChannelID, arMessage.ID);
-	std::string lLog = "**MESSAGE DELETE:**\n```Message ID: " + arMessage.ID.string() + "\nDeleted by: " + acrUser.username + "#" + acrUser.discriminator + "\nChannel: " + arMessage.channelID.string() + "\nMessage content: " + arMessage.content + "\n```";
-	logAction(acrServerID, acrUser, lLog);
+	SleepyDiscord::User lUser;
+	std::string lLog = "**MESSAGE DELETE:**\n```Message ID: " + arMessage.ID.string() + "\nDeleted by: " + lUser.username + "#" + lUser.discriminator + "\nChannel: " + arMessage.channelID.string() + "\nMessage content: " + arMessage.content + "\n```";
+	logAction(acrServerID, acrUserID, lLog);
 }
 
-void MyClientClass::fn_logAction(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const std::string& acrString) {
+void MyClientClass::fn_logAction(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const std::string& acrString) {
 	std::mutex mutex;
 	mutex.lock();
 	if (m_serverBotSettings.at(acrServerID).noLogs == false) {
 		if (m_serverBotSettings.at(acrServerID).logsChannelID != SleepyDiscord::Snowflake<SleepyDiscord::Channel>()) {
 			mutex.unlock();
-			echo(acrServerID, acrUser, m_serverBotSettings.at(acrServerID).logsChannelID, acrString);
+			echo(acrServerID, acrUserID, m_serverBotSettings.at(acrServerID).logsChannelID, acrString);
 		}
 		else {
 			mutex.unlock();
@@ -820,7 +828,7 @@ void MyClientClass::fn_logAction(const SleepyDiscord::Snowflake<SleepyDiscord::S
 	}
 }
 
-void MyClientClass::fn_setPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, COMMAND_PERMISSION aCommandPerm, COMMAND_TYPE aCommandType) {
+void MyClientClass::fn_setPermissions(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, COMMAND_PERMISSION aCommandPerm, COMMAND_TYPE aCommandType) {
 	std::mutex mutex;
 
 	mutex.lock();
@@ -844,22 +852,23 @@ void MyClientClass::fn_setPermissions(const SleepyDiscord::Snowflake<SleepyDisco
 		{ COMMAND_TYPE::ROLE_ALL,  std::string("all") 		}
 	}; 
 
-	logAction(acrServerID, acrUser, "**PERMISSIONS CHANGE:**\n```Type: " + lType[aCommandType] + "\nSet to: " + lPerms[aCommandPerm] + "\nSet by: " + acrUser.username + "#" + acrUser.discriminator + "```\n");
+	SleepyDiscord::User lUser;
+	logAction(acrServerID, acrUserID, "**PERMISSIONS CHANGE:**\n```Type: " + lType[aCommandType] + "\nSet to: " + lPerms[aCommandPerm] + "\nSet by: " + lUser.username + "#" + lUser.discriminator + "```\n");
 }
 
-void MyClientClass::fn_setChannelName(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrName) {
+void MyClientClass::fn_setChannelName(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrName) {
 	editChannelName(acrChannelID, acrName);
 }
 
-void MyClientClass::fn_setChannelTopic	(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrTopic) {
+void MyClientClass::fn_setChannelTopic	(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrTopic) {
 	editChannelTopic(acrChannelID, acrTopic);
 }
 
-void MyClientClass::fn_deleteChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+void MyClientClass::fn_deleteChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
 	deleteChannel(acrChannelID);
 }
 
-void MyClientClass::fn_pinMessage(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::Message>& acrMessageID) {
+void MyClientClass::fn_pinMessage(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::Message>& acrMessageID) {
 	if(std::find(getPinnedMessages(acrChannelID).vector().begin(), getPinnedMessages(acrChannelID).vector().end(), acrMessageID) == getPinnedMessages(acrChannelID).vector().end()) {
 		pinMessage(acrChannelID, acrMessageID);
 	} else {
@@ -867,7 +876,7 @@ void MyClientClass::fn_pinMessage(const SleepyDiscord::Snowflake<SleepyDiscord::
 	}
 }
 
-void MyClientClass::fn_unpinMessage(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::Message>& acrMessageID) {
+void MyClientClass::fn_unpinMessage(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::Message>& acrMessageID) {
 	if(std::find(getPinnedMessages(acrChannelID).vector().begin(), getPinnedMessages(acrChannelID).vector().end(), acrMessageID) != getPinnedMessages(acrChannelID).vector().end()) {
 		unpinMessage(acrChannelID, acrMessageID);
 	} else {
@@ -875,7 +884,7 @@ void MyClientClass::fn_unpinMessage(const SleepyDiscord::Snowflake<SleepyDiscord
 	}
 }
 
-void MyClientClass::fn_changeNickname(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrNicknamedUserID, const std::string& acrNickname) {
+void MyClientClass::fn_changeNickname(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrNicknamedUserID, const std::string& acrNickname) {
 	if(isBot(acrNicknamedUserID)) {
 		editNickname(acrServerID, acrNickname);
 	} else {
@@ -884,19 +893,19 @@ void MyClientClass::fn_changeNickname(const SleepyDiscord::Snowflake<SleepyDisco
 	}
 }
 
-void MyClientClass::fn_removeRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrRemovedUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
+void MyClientClass::fn_removeRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrRemovedUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
 	removeRole(acrServerID, acrRemovedUserID, acrRoleID);
 }
 
-void MyClientClass::fn_deleteRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
+void MyClientClass::fn_deleteRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
 	deleteRole(acrServerID, acrRoleID);
 }
 
-void MyClientClass::fn_pruneUsers(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, int aNumDays) {
+void MyClientClass::fn_pruneUsers(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, int aNumDays) {
 	pruneMembers(acrServerID, aNumDays);
 }
 
-void MyClientClass::fn_deleteInvite(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const std::string& acrInvite) {
+void MyClientClass::fn_deleteInvite(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const std::string& acrInvite) {
 	std::string lInviteCode;
 	if(acrInvite.find("https://discord.gg/") != std::string::npos) {
 		lInviteCode = acrInvite.substr(strlen("https://discord.gg/"));
@@ -908,68 +917,68 @@ void MyClientClass::fn_deleteInvite(const SleepyDiscord::Snowflake<SleepyDiscord
 	deleteInvite(lInviteCode);
 }
 
-void MyClientClass::fn_deleteChannelInvites(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+void MyClientClass::fn_deleteChannelInvites(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
 	auto lVec = getChannelInvites(acrChannelID).vector();
 	for(auto lInvite : lVec) {
 		deleteInvite(lInvite.code);
 	}
 }
 
-void MyClientClass::fn_deleteAllInvites(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser) {
+void MyClientClass::fn_deleteAllInvites(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
 	auto lVec = getServerInvites(acrServerID).vector();
 	for(auto lInvite : lVec) {
 		deleteInvite(lInvite.code);
 	}
 }
 
-void MyClientClass::fn_leaveServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser) {
+void MyClientClass::fn_leaveServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
 	leaveServer(acrServerID);
 }
 
-void MyClientClass::fn_setStatus(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const std::string& acrActivityName, const SleepyDiscord::Status acStatus, bool abAFK, int aIdleTime) {
+void MyClientClass::fn_setStatus(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const std::string& acrActivityName, const SleepyDiscord::Status acStatus, bool abAFK, int aIdleTime) {
 	updateStatus(acrActivityName, aIdleTime, acStatus, abAFK);
 }
 
-void MyClientClass::fn_setBotActivity(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const std::string& acrActivityName) {
+void MyClientClass::fn_setBotActivity(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const std::string& acrActivityName) {
 	botStatus.activity = acrActivityName;
 	updateStatus(botStatus.activity, botStatus.idleSince, botStatus.status, botStatus.AFK);
 }
 
-void MyClientClass::fn_setBotIdle(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, int aIdleTime) {
+void MyClientClass::fn_setBotIdle(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, int aIdleTime) {
 	botStatus.idleSince = aIdleTime;
 	updateStatus(botStatus.activity, botStatus.idleSince, botStatus.status, botStatus.AFK);
 }
 
-void MyClientClass::fn_setBotStatus(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Status acStatus) {
+void MyClientClass::fn_setBotStatus(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Status acStatus) {
 	botStatus.status = acStatus;
 	updateStatus(botStatus.activity, botStatus.idleSince, botStatus.status, botStatus.AFK);
 }
 	
-void MyClientClass::fn_setBotAFK(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, bool abAFK) {
+void MyClientClass::fn_setBotAFK(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, bool abAFK) {
 	botStatus.AFK = abAFK;
 	updateStatus(botStatus.activity, botStatus.idleSince, botStatus.status, botStatus.AFK);
 }
 
-void MyClientClass::fn_die(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+void MyClientClass::fn_die(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
 	const std::string lcMessage = "Okay.";
-	echo(acrServerID, acrUser, acrChannelID, lcMessage);
+	echo(acrServerID, acrUserID, acrChannelID, lcMessage);
 	quit();
 }
 
-void MyClientClass::fn_bannedOps(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+void MyClientClass::fn_bannedOps(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
 	const std::string lcMessage = "Aruni, Clash, Oryx.";
-	echo(acrServerID, acrUser, acrChannelID, lcMessage);
+	echo(acrServerID, acrUserID, acrChannelID, lcMessage);
 }
 
-void MyClientClass::fn_sonarPing(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrPingedUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, unsigned int aCount) {
+void MyClientClass::fn_sonarPing(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrPingedUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, unsigned int aCount) {
 	if(aCount == 0) {
 		return;
 	} else {
 		std::string lMention = Mention<SleepyDiscord::User>(acrPingedUserID);
 		for(int i = 0; i < aCount; i++) {
-			echo(acrServerID, acrUser, acrChannelID, lMention + " Sonar ping.");
+			echo(acrServerID, acrUserID, acrChannelID, lMention + " Sonar ping.");
 			sleep(_C_SONAR_PING_DELAY);
-			echo(acrServerID, acrUser, acrChannelID, lMention + " Sonar pong.");
+			echo(acrServerID, acrUserID, acrChannelID, lMention + " Sonar pong.");
 			sleep(_C_SONAR_PONG_DELAY);
 		}
 	}
