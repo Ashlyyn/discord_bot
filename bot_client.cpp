@@ -1,3 +1,5 @@
+#include "rapidjson/prettywriter.h"
+
 #include "bot_client.hpp"
 #include "mention.hpp"
 
@@ -47,7 +49,7 @@ void MyClientClass::readServerInfo() {
 		
 		// stringify document
 		rapidjson::StringBuffer lStringBuffer;
-		rapidjson::Writer<rapidjson::StringBuffer> lWriter(lStringBuffer);
+		rapidjson::PrettyWriter<rapidjson::StringBuffer> lWriter(lStringBuffer);
 		lDoc.Accept(lWriter);
 
 		// update m_serverInfoJSON
@@ -163,7 +165,7 @@ void MyClientClass::addServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::
 
 	// stringify document
 	rapidjson::StringBuffer lStringBuffer;
-	rapidjson::Writer<rapidjson::StringBuffer> lWriter(lStringBuffer);
+	rapidjson::PrettyWriter<rapidjson::StringBuffer> lWriter(lStringBuffer);
 	lDoc.Accept(lWriter);
 	// update m_serverInfoJSON
 	m_serverInfoJSON = lStringBuffer.GetString();
@@ -208,7 +210,7 @@ void MyClientClass::updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscor
 
 	// stringify document
 	rapidjson::StringBuffer lStringBuffer;
-	rapidjson::Writer<rapidjson::StringBuffer> lWriter(lStringBuffer);
+	rapidjson::PrettyWriter<rapidjson::StringBuffer> lWriter(lStringBuffer);
 	lDoc.Accept(lWriter);
 	
 	// update m_serverInfoJSON
