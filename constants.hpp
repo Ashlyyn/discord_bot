@@ -1,8 +1,6 @@
 #ifndef _CONSTANTS_HPP_
 #define _CONSTANTS_HPP_
 
-#define _C_BOT_OWNER_ID       518216114665291786
-#define _C_BOT_ID             783177811950960670
 #define _C_SONAR_PING_DELAY   500
 #define _C_SONAR_PONG_DELAY   2000
 #define _C_DEFAULT_BOT_PREFIX "F!"
