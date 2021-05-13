@@ -1,1 +1,4 @@
-{"project":"bot","serverInfo":{"819393293103267850":{"silent":false,"noLogs":false,"prefix":"F!","logsChannelID":"","botAdminRoleID":"","mutedUserIDs":[],"permissions":[2,2]},"811927861836382219":{"silent":false,"noLogs":false,"prefix":"F!","logsChannelID":null,"botAdminRoleID":null,"mutedUserIDs":[],"permissions":[2,2]}}}
+{
+    "project": "bot",
+    "serverInfo": { }
+}
