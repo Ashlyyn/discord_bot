@@ -59,14 +59,14 @@ public:
 	Command die					 = Command("die",					this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_die);
 	Command bannedOps			 = Command("banned_ops",			this, Command::COMMAND_TYPE::NON_ADMIN,	&MyClientClass::fn_bannedOps);
 	Command sonarPing			 = Command("sonar_ping",			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_sonarPing,	true);
-	Command fuckoff				 = Command("fuckoff",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_leaveServer);
+	Command fuckoff				 = Command("fuckoff",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_leaveServer); // more or less an alias of leave
 
-	void init();
-	void readConfig();
-	void readServerInfo();
-	void parseServers();
-	void addServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
-	void updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
+	void init(); // initialization - grab data from server_info.json, set s_botID
+	void readConfig(); // read config.json, verify ownerID is valid, set s_ownerID if so, exit if not
+	void readServerInfo(); // read server_info.json into m_serverInfoJSON, or create if not already present
+	void parseServers(); // parse serverInfo and set bot settings accordingly
+	void addServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID); // add new server to server info
+	void updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID); // update existing server info
 
 	// client function overrides
 	void onMessage(SleepyDiscord::Message aMessage) override;
@@ -75,6 +75,8 @@ public:
 	void onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aRemovedUser) override;
 
 	// helper functions
+
+	// public to allow access from Command
 	bool hasRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID);
 
 	inline static bool isOwner(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
@@ -103,13 +105,15 @@ public:
 		bool AFK = false;
 	} botStatus;
 
+	// server cache, used to reduce web requests when possible for efficiency purposes
 	inline static ServerCache m_cache = ServerCache();
 
+	// default-initialized to prevent linker errors
 	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> s_botID	  = SleepyDiscord::Snowflake<SleepyDiscord::User>();
 	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> s_ownerID = SleepyDiscord::Snowflake<SleepyDiscord::User>();
 
-	std::string m_configJSON;
-	std::string m_serverInfoJSON;
+	std::string m_configJSON; // config info from config.json
+	std::string m_serverInfoJSON; // server info from server_info.json
 
 	// std::string used in place of SleepyDiscord::Snowflake to prevent needing to supply a hash
 	std::unordered_map<std::string, SleepyDiscord::Snowflake<SleepyDiscord::Channel>> m_userDMchannelIDs; // map server IDs to DM channel IDs
