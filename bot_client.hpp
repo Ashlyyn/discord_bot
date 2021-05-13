@@ -102,8 +102,8 @@ public:
 		bool AFK = false;
 	} botStatus;
 
-	inline static const SleepyDiscord::Snowflake<SleepyDiscord::User> s_ownerID = _C_BOT_OWNER_ID;
-	inline static const SleepyDiscord::Snowflake<SleepyDiscord::User> s_botID   = _C_BOT_ID;
+	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> s_botID	  = SleepyDiscord::Snowflake<SleepyDiscord::User>();
+	inline static SleepyDiscord::Snowflake<SleepyDiscord::User> s_ownerID = SleepyDiscord::Snowflake<SleepyDiscord::User>();
 
 	std::string m_configJSON;
 	std::string m_serverInfoJSON;
