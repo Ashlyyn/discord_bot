@@ -2,9 +2,11 @@
 #include "mention.hpp"
 
 void MyClientClass::init() {
+	s_botID = getID();
 	try {
 		readServerInfo();
 	}
+	
 	catch (const std::runtime_error& e) {
 		std::fprintf(stderr, "init(): %s\n", e.what());
 		return;
@@ -24,7 +26,7 @@ void MyClientClass::readConfig() {
 	lSS << lConfigFile.rdbuf();
 	if(lSS.str().empty()) {
 		std::fprintf(stderr, "readConfig(): config.json empty, exiting.\n");
-		std::exit(3);
+		std::exit(5);
 	}
 	m_configJSON = lSS.str();
 }
