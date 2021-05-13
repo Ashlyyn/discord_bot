@@ -9,7 +9,7 @@ if(UNIX)
 endif(UNIX)
 project(bot)
 
-add_executable(bot_test main.cpp bot_client.cpp command.cpp mention.cpp server_bot_settings.cpp)
+add_executable(bot_test main.cpp bot_client.cpp command.cpp mention.cpp server_bot_settings.cpp server_cache.cpp)
 add_subdirectory(deps/sleepy-discord)
 target_link_libraries(bot_test sleepy-discord)
 
