@@ -184,11 +184,13 @@ void MyClientClass::updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscor
 	rapidjson::Document lDoc;
 	lDoc.Parse(m_serverInfoJSON.c_str());
 
+	// get iterator to serverInfo value
 	rapidjson::Value& lServerInfoVal = lDoc["serverInfo"];
 	rapidjson::Value lStringVal;
 	lStringVal.SetString(acrServerID.string().c_str(), acrServerID.string().size(), lDoc.GetAllocator());
 	rapidjson::Value::MemberIterator itr = lServerInfoVal.FindMember(lStringVal);
 
+	// and set all values to their correct values from m_serverBotSettings
 	itr->value["silent"].SetBool(m_serverBotSettings.at(acrServerID).silent);
 	itr->value["noLogs"].SetBool(m_serverBotSettings.at(acrServerID).noLogs);
 	itr->value["prefix"].SetString(rapidjson::StringRef(m_serverBotSettings.at(acrServerID).prefix.c_str()));
@@ -197,8 +199,10 @@ void MyClientClass::updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscor
 	itr->value["permissions"].GetArray()[0].SetInt(m_serverBotSettings.at(acrServerID).permissions[0]);
 	itr->value["permissions"].GetArray()[1].SetInt(m_serverBotSettings.at(acrServerID).permissions[1]);
 
+	// clear value before adding to prevent duplicates
 	itr->value["mutedUserIDs"].Clear();
 	for (int i = 0; i < m_serverBotSettings.at(acrServerID).mutedUserIDs.size(); i++) {
+		// and add user IDs to value
 		itr->value["mutedUserIDs"].PushBack(rapidjson::StringRef(m_serverBotSettings.at(acrServerID).mutedUserIDs[i].string().c_str()), lDoc.GetAllocator());
 	}
 
@@ -206,6 +210,7 @@ void MyClientClass::updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscor
 	rapidjson::StringBuffer lStringBuffer;
 	rapidjson::Writer<rapidjson::StringBuffer> lWriter(lStringBuffer);
 	lDoc.Accept(lWriter);
+	
 	// update m_serverInfoJSON
 	m_serverInfoJSON = lStringBuffer.GetString();
 
