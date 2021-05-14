@@ -6,6 +6,7 @@
 void MyClientClass::init() {
 	try {
 		s_botID = getID();
+		readConfig();
 		readServerInfo();
 	}
 	
@@ -18,6 +19,8 @@ void MyClientClass::init() {
 void MyClientClass::readConfig() {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
+
+	std::fprintf(stderr, "readConfig()\n");
 
 	if(!std::ifstream("../config.json")) {
 		std::fprintf(stderr, "readConfig(): config.json not found or failed to open, exiting.\n");
@@ -36,6 +39,8 @@ void MyClientClass::readConfig() {
 void MyClientClass::readServerInfo() {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
+
+	std::fprintf(stderr, "readServerInfo()\n");
 
 	// if server_info.json doesn't exist, create and return early since it will have no data to be parsed
 	if(!std::ifstream("../server_info.json")) {
@@ -64,6 +69,14 @@ void MyClientClass::readServerInfo() {
 	std::stringstream lSS;
 	lSS << lServerInfoFile.rdbuf();
 	m_serverInfoJSON = lSS.str();
+
+	rapidjson::Document lDoc;
+	lDoc.Parse(m_serverInfoJSON.c_str());
+	// don't parse servers if there are no servers to parse
+	if (!lDoc["serverInfo"].IsArray() || lDoc["serverInfo"].Empty()) {
+		return;
+	}
+
 	try {
 		parseServers();
 	}
@@ -76,20 +89,26 @@ void MyClientClass::parseServers() {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
 
+	std::fprintf(stderr, "parseServers()\n");
+
+
 	if (m_serverInfoJSON.empty()) {
 		throw std::runtime_error("parseServers(): m_serverInfoJSON empty.");
 	}
+	std::fprintf(stderr, "%s\n", m_serverInfoJSON.c_str());
 
 	rapidjson::Document lDoc;
 	lDoc.Parse(m_serverInfoJSON.c_str());
+
 	if (lDoc.HasMember("serverInfo") == false) {
 		throw std::runtime_error("parseServers(): serverInfo not found.");
 	}
+
 	rapidjson::Value& lServerInfoVal = lDoc["serverInfo"]; 
-	if (lServerInfoVal.MemberCount() == 0) {
+	if (lServerInfoVal.Empty()) {
 		return;
 	}
-
+	
 	for (rapidjson::Value::ConstMemberIterator itr = lServerInfoVal.MemberBegin(); itr != lServerInfoVal.MemberEnd(); ++itr) {
 		const std::string lcSnowflake = itr->name.GetString();
 		m_serverBotSettings[lcSnowflake] = ServerBotSettings();
@@ -131,6 +150,8 @@ void MyClientClass::parseServers() {
 void MyClientClass::addServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
+
+	std::fprintf(stderr, "addServerInfo()\n");
 
 	// read in m_serverInfoJSON
 	rapidjson::Document lDoc;
@@ -181,6 +202,8 @@ void MyClientClass::addServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::
 void MyClientClass::updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
+	
+	std::fprintf(stderr, "updateServerInfo()\n");
 
 	// read in m_serverInfoJSON
 	rapidjson::Document lDoc;
@@ -545,18 +568,20 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 
 void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 	std::mutex mutex;
-	mutex.lock();
+
+	std::fprintf(stderr, "onServer()\n");
 
 	m_cache.addServer(aServer);
 
 	try {
+		mutex.lock();
 		// if std::map::at throws std::out_of_range, entry doesn't exist
 		m_serverBotSettings.at(aServer.ID);
+		mutex.unlock();
 	} catch(const std::out_of_range& e) {
 		// if entry doesn't exist, create it and add it to server info
-		m_serverBotSettings[aServer.ID] = ServerBotSettings();
+		m_serverBotSettings[aServer.ID];
 		try {
-			mutex.unlock();
 			addServerInfo(aServer.ID);
 		} catch(const std::ios_base::failure& e) {
 			std::fprintf(stderr, "onServer(): %s", e.what());
