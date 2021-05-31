@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED 17)
 set(CMAKE_BUILD_TYPE Debug)
 if(UNIX)
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wno-overloaded-virtual -Wno-deprecated-declarations")
-	set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -Wno-overloaded-virtual -Wno-deprecated-declarations")
+	set(CMAKE_CXX_FLAGS_DEBUG   "-O0 -Wno-overloaded-virtual -Wno-deprecated-declarations -g")
 endif(UNIX)
 project(bot)
 
