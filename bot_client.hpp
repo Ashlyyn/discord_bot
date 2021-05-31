@@ -61,18 +61,22 @@ public:
 	Command sonarPing			 = Command("sonar_ping",			this, Command::COMMAND_TYPE::ADMIN,		&MyClientClass::fn_sonarPing,	true);
 	Command fuckoff				 = Command("fuckoff",				this, Command::COMMAND_TYPE::ADMIN,	  	&MyClientClass::fn_leaveServer); // more or less an alias of leave
 
-	void init(); // initialization - grab data from server_info.json, set s_botID
-	void readConfig(); // read config.json, verify ownerID is valid, set s_ownerID if so, exit if not
-	void readServerInfo(); // read server_info.json into m_serverInfoJSON, or create if not already present
-	void parseServers(); // parse serverInfo and set bot settings accordingly
-	void addServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID); // add new server to server info
+	void init			 (); // initialization - grab data from server_info.json, set s_botID
+	void readConfig		 (); // read config.json, verify ownerID is valid, set s_ownerID if so, exit if not
+	void readServerInfo	 (); // read server_info.json into m_serverInfoJSON, or create if not already present
+	void parseServers	 (); // parse serverInfo and set bot settings accordingly
+	void addServerInfo   (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID); // add new server to server info
 	void updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID); // update existing server info
+	void removeServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID); // remove server info (i.e. if server is deleted)
 
 	// client function overrides
-	void onMessage(SleepyDiscord::Message aMessage) override;
-	void onServer(SleepyDiscord::Server aServer) override;
-	void onBan(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUser) override;
-	void onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aRemovedUser) override;
+	void onMessage		(SleepyDiscord::Message aMessage) override;
+	void onServer		(SleepyDiscord::Server aServer) override;
+	void onDeleteServer (SleepyDiscord::UnavailableServer aRemovedServer) override;
+	void onBan			(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUser) override;
+	void onUnban		(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUnbannedUser) override;
+	void onMember		(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::ServerMember aMember) override;
+	void onRemoveMember	(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aRemovedUser) override;
 
 	// helper functions
 

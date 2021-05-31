@@ -224,6 +224,37 @@ void MyClientClass::updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscor
 	lServerInfoFile << lStringBuffer.GetString();
 }
 
+void MyClientClass::removeServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+	std::mutex mutex;
+	std::lock_guard lock(mutex);
+
+	// read in m_serverInfoJSON
+	rapidjson::Document lDoc;
+	lDoc.Parse(m_serverInfoJSON.c_str());
+
+	// erase info for server
+	rapidjson::Value& lServerInfoVal = lDoc["serverInfo"];
+	rapidjson::Value lStringVal;
+	lStringVal.SetString(acrServerID.string().c_str(), acrServerID.string().size(), lDoc.GetAllocator());
+	lServerInfoVal.EraseMember(lStringVal);
+
+	// stringify document
+	rapidjson::StringBuffer lStringBuffer;
+	rapidjson::PrettyWriter<rapidjson::StringBuffer> lWriter(lStringBuffer);
+	lDoc.Accept(lWriter);
+	
+	// update m_serverInfoJSON
+	m_serverInfoJSON = lStringBuffer.GetString();
+
+	// and write update config to disk
+	std::ofstream lServerInfoFile("../server_info.json", std::ofstream::trunc);
+	if(!lServerInfoFile) {
+		throw std::ios_base::failure("removeServerInfo(): failed to open server_info.json");
+	}
+
+	lServerInfoFile << lStringBuffer.GetString();
+}
+
 // ignore this clusterfuck, I haven't the time nor energy to sort it out
 void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
     try {
@@ -547,7 +578,7 @@ void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 	std::mutex mutex;
 	mutex.lock();
 
-	m_cache.addServer(aServer);
+	m_cache.addServer(aServer, getBans(aServer.ID).vector());
 
 	try {
 		// if std::map::at throws std::out_of_range, entry doesn't exist
@@ -559,8 +590,8 @@ void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 			mutex.unlock();
 			addServerInfo(aServer.ID);
 		} catch(const std::ios_base::failure& e) {
-			std::fprintf(stderr, "onServer(): %s", e.what());
 			mutex.unlock();
+			std::fprintf(stderr, "onServer(): %s", e.what());
 			return;
 		}
 		mutex.unlock();
@@ -569,22 +600,45 @@ void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 	mutex.unlock();
 }
 
+void MyClientClass::onDeleteServer(SleepyDiscord::UnavailableServer aRemovedServer) {
+	m_cache.removeServer(aRemovedServer);
+	m_serverBotSettings.erase(aRemovedServer.ID);
+	removeServerInfo(aRemovedServer.ID);
+}
+
 void MyClientClass::onBan(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aBannedUser) {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
 
 	// if user wasn't already added to m_bannedUsers by ban()
-	if(m_bannedUsers.find(aBannedUser.ID) == m_bannedUsers.end()) {
+	if(std::find(m_cache.getBannedUserIDs(aServerID).begin(), m_cache.getBannedUserIDs(aServerID).end(), aBannedUser.ID) == m_cache.getBannedUserIDs(aServerID).end()) {
 		// if user wasn't already added, then they weren't manually banned (set bool value to false)
-		m_bannedUsers[aBannedUser.ID] = std::make_pair(aBannedUser, false);
+		m_cache.getBannedUserIDs(aServerID).push_back(aBannedUser.ID);
+	//m_bannedUsers[aBannedUser.ID] = std::make_pair(aBannedUser, false);
 	}
 	// client automatically calls onRemoveUser(), which handles the logging
 }
 
+void MyClientClass::onUnban(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUnbannedUser) {
+	std::mutex mutex;
+	std::lock_guard lock(mutex);
+
+	m_cache.getBannedUserIDs(aServerID).erase(std::find(m_cache.getBannedUserIDs(aServerID).begin(), m_cache.getBannedUserIDs(aServerID).end(), aUnbannedUser.ID));
+	// client automatically calls onMember(), which handles the logging
+}
+
+void MyClientClass::onMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::ServerMember aMember) {
+	std::mutex mutex;
+	std::lock_guard lock(mutex);
+
+	m_cache.getServerMembers(aServerID).push_back(aMember);
+}
+
+
 void MyClientClass::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aRemovedUser) {
 	std::mutex mutex;
 
-	m_cache.getServer(aServerID).members.erase(std::find(m_cache.getServer(aServerID).members.begin(), m_cache.getServer(aServerID).members.end(), aRemovedUser));
+	m_cache.getServerMembers(aServerID).erase(std::find(m_cache.getServerMembers(aServerID).begin(), m_cache.getServerMembers(aServerID).end(), aRemovedUser));
 
 	std::time_t lTime = std::time(nullptr);
 	std::put_time(std::gmtime(&lTime), "%c"); // get date/time info for log
@@ -594,7 +648,7 @@ void MyClientClass::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Serve
 	std::string lLog;
 	
 	mutex.lock();
-	m_cache.getServer(aServerID).members.erase(m_cache.getServer(aServerID).findMember(aRemovedUser.ID)); // remove user from cached server
+	m_cache.getServerMembers(aServerID).erase(m_cache.getServer(aServerID).findMember(aRemovedUser.ID)); // remove user from cached server
 	// if user was banned, not kicked
 	if((m_bannedUsers.find(aRemovedUser.ID) != m_bannedUsers.end()) && (m_kickedUsers.find(aRemovedUser.ID) == m_kickedUsers.end())) {
 		// if user was not banned by bot, log ban
@@ -622,8 +676,6 @@ void MyClientClass::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Serve
 	}
 	mutex.unlock();
 }
-
-
 
 void MyClientClass::fn_changePrefix(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrNewPrefix) {
 	std::mutex mutex;
@@ -1088,8 +1140,8 @@ bool MyClientClass::hasRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server
 bool MyClientClass::hasPermission(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Permission acPermission) {
 	SleepyDiscord::Server lServer = m_cache.getServer(acrServerID);
 	const SleepyDiscord::ServerMember lcMember = m_cache.getMember(acrServerID, acrUserID);
-	std::vector<SleepyDiscord::Role> lcRoles = m_cache.getRoles(acrServerID);
-	for(const SleepyDiscord::Role& lcRole : lcRoles) {
+	std::list<SleepyDiscord::Role>& lcrRoles = m_cache.getRoles(acrServerID);
+	for(const SleepyDiscord::Role& lcRole : lcrRoles) {
 		if(hasRole(acrServerID, acrUserID, lcRole.ID)) {
 			if(lcRole.permissions & acPermission) {
 				return true;
