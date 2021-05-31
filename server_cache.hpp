@@ -33,16 +33,15 @@ public:
     //std::vector<SleepyDiscord::User>        getReactions        (const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::Message> acrMessageID, const std::string& acrEmoji);
     
     
-    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Server>>  getServerIDs          ();
+    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Server>>  getServerIDs                      ();
     //std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Message>> getPinnedMessageIDs   (const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
-    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Channel>> getServerChannelIDs   (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
+    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Channel>> getServerChannelIDs               (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
     //std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User>>    getBannedUserIDs      (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
-    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>>    getRoleIDs            (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
-    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User>>&   getBannedUserIDs      (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
+    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>>    getRoleIDs                        (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
+    std::vector<std::pair<SleepyDiscord::Snowflake<SleepyDiscord::User>, bool>>& getBannedUserIDs   (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
     
 
 private:
     std::unordered_map<std::string, SleepyDiscord::Server> m_servers;
-    std::unordered_map<std::string, std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User>>> m_bannedUserIDs;
-    
+    std::unordered_map<std::string, std::vector<std::pair<SleepyDiscord::Snowflake<SleepyDiscord::User>, bool>>> m_bannedUserIDs;
 };

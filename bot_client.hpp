@@ -122,8 +122,6 @@ public:
 	// std::string used in place of SleepyDiscord::Snowflake to prevent needing to supply a hash
 	std::unordered_map<std::string, SleepyDiscord::Snowflake<SleepyDiscord::Channel>> m_userDMchannelIDs; // map server IDs to DM channel IDs
 	std::unordered_map<std::string, ServerBotSettings> m_serverBotSettings; // map server IDs to their respective settings struct
-	std::unordered_map<std::string, std::pair<SleepyDiscord::User, bool>> m_bannedUsers; // map server IDs to users banned from servers 
-																						 // and whether they were banned via the bot
 	std::unordered_map<std::string, std::pair<SleepyDiscord::User, bool>> m_kickedUsers; // map server IDs to users kicked from the server
 																						 // same thing with the bool
 
