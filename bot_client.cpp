@@ -1083,7 +1083,10 @@ std::vector<std::string> MyClientClass::split(const std::string& acrString) { //
 }
 
 std::string MyClientClass::getSnowflake(const std::string& acrString) {
-	if(acrString.find("<@!") != std::string::npos) { // user mention
+	if(acrString.find("<@") != std::string::npos) { // user mention
+		return acrString.substr(2, acrString.size() - 2 - 1);
+	}
+	else if(acrString.find("<@!") != std::string::npos) { // member mention
 		return acrString.substr(3, acrString.size() - 3 - 1);
 	}
 	else if(acrString.find("<#") != std::string::npos) { // channel mention

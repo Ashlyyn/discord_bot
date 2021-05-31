@@ -7,7 +7,7 @@
 // templates specialized since user, channel, and role all have a different prefix
 
 template<> Mention<SleepyDiscord::User>::Mention(const std::string& acrSnowflake) {
-    m_prefix = "<@!";
+    m_prefix = "<@";
     m_mention = acrSnowflake;
 }
 
@@ -28,7 +28,7 @@ template<> Mention<SleepyDiscord::Role>::Mention(const std::string& acrSnowflake
 
 template<> Mention<SleepyDiscord::User>::Mention(const SleepyDiscord::User& acrUser) {
     SleepyDiscord::Snowflake<SleepyDiscord::User> acrSnowflake = acrUser;
-    m_prefix = "<@!";
+    m_prefix = "<@";
     m_mention = acrSnowflake;
 }
 
@@ -51,7 +51,7 @@ template<> Mention<SleepyDiscord::Role>::Mention(const SleepyDiscord::Role& acrR
 }
 
 template<> Mention<SleepyDiscord::User>::Mention(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrSnowflake) {
-    m_prefix = "<@!";
+    m_prefix = "<@";
     m_mention = acrSnowflake;
 }
 
@@ -71,7 +71,7 @@ template<> Mention<SleepyDiscord::Role>::Mention(const SleepyDiscord::Snowflake<
 }
 
 template<> Mention<SleepyDiscord::Snowflake<SleepyDiscord::User>>::Mention(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrSnowflake) {
-    m_prefix = "<@!";
+    m_prefix = "<@";
     m_mention = acrSnowflake;
 }
 
@@ -92,7 +92,7 @@ template<> Mention<SleepyDiscord::Snowflake<SleepyDiscord::Role>>::Mention(const
 
 template<> void Mention<SleepyDiscord::User>::operator=(const SleepyDiscord::User& acrUser) {
     SleepyDiscord::Snowflake<SleepyDiscord::User> acrSnowflake = acrUser;
-    m_prefix = "<@!";
+    m_prefix = "<@";
     m_mention = acrSnowflake;
 }
 
@@ -115,7 +115,7 @@ template<> void Mention<SleepyDiscord::Role>::operator=(const SleepyDiscord::Rol
 }
 
 template<> void Mention<SleepyDiscord::Snowflake<SleepyDiscord::User>>::operator=(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrSnowflake) {
-    m_prefix = "<@!";
+    m_prefix = "<@";
     m_mention = acrSnowflake;
 }
 
