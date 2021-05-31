@@ -1,9 +1,18 @@
 #include "server_cache.hpp"
 
-void ServerCache::addServer(const SleepyDiscord::Server& acrServer) {
+void ServerCache::addServer(const SleepyDiscord::Server& acrServer, const std::vector<SleepyDiscord::User>& acrBannedUsers) {
     m_servers[acrServer.ID] = acrServer;
+    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User>> lBannedUserIDs;
+    for(const auto& lBannedUser : acrBannedUsers) {
+        lBannedUserIDs.push_back(lBannedUser.ID);
+    }
+    m_bannedUserIDs[acrServer.ID] = lBannedUserIDs;
 }
     
+void ServerCache::removeServer(const SleepyDiscord::UnavailableServer& acrRemovedServer) {
+    m_servers.erase(acrRemovedServer.ID);
+    m_bannedUserIDs.erase(acrRemovedServer.ID);
+}
 
 /*
 SleepyDiscord::Invite ServerCache::getInvite(const std::string& acrInviteCode) {
@@ -132,43 +141,32 @@ std::vector<SleepyDiscord::Server> ServerCache::getServers() {
     return lServers;
 }
 
-std::vector<SleepyDiscord::Channel> ServerCache::getServerChannels(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
-    std::vector<SleepyDiscord::Channel> lReturnVal;
+std::list<SleepyDiscord::Channel>& ServerCache::getServerChannels(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
     try {
-        SleepyDiscord::Server lServer = m_servers.at(acrServerID);
-        for(const auto& lVal : lServer.channels) {
-            lReturnVal.push_back(lVal);
-        }
+        m_servers.at(acrServerID);
     } catch(const std::out_of_range& e) {
         throw std::out_of_range(std::string("getServerChannels(): ") + e.what());
     }
-    return lReturnVal;
+    return m_servers.at(acrServerID).channels;
 }
 
-std::vector<SleepyDiscord::Role> ServerCache::getRoles(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
-    std::vector<SleepyDiscord::Role> lReturnVal;
+std::list<SleepyDiscord::Role>& ServerCache::getRoles(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
     try {
         SleepyDiscord::Server lServer = m_servers.at(acrServerID);
-        for(const auto& lVal : lServer.roles) {
-            lReturnVal.push_back(lVal);
-        }
     } catch(const std::out_of_range& e) {
         throw std::out_of_range(std::string("getRoles(): ") + e.what());
     }
-    return lReturnVal;
+    return m_servers.at(acrServerID).roles;
 }
 
-std::vector<SleepyDiscord::ServerMember> ServerCache::getServerMembers(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+std::list<SleepyDiscord::ServerMember>& ServerCache::getServerMembers(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
     std::vector<SleepyDiscord::ServerMember> lReturnVal;
     try {
-        SleepyDiscord::Server lServer = m_servers.at(acrServerID);
-        for(const auto& lVal : lServer.members) {
-            lReturnVal.push_back(lVal);
-        }
+        m_servers.at(acrServerID);
     } catch(const std::out_of_range& e) {
         throw std::out_of_range(std::string("getServerMembers(): ") + e.what());
     }
-    return lReturnVal;
+    return m_servers.at(acrServerID).members;
 }
 
 std::vector<SleepyDiscord::User> ServerCache::getUsers(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
@@ -179,7 +177,7 @@ std::vector<SleepyDiscord::User> ServerCache::getUsers(const SleepyDiscord::Snow
             lReturnVal.push_back(lVal.user);
         }
     } catch(const std::out_of_range& e) {
-        throw std::out_of_range(std::string("getServerRoles(): ") + e.what());
+        throw std::out_of_range(std::string("getUsers(): ") + e.what());
     }
     return lReturnVal;
 }
@@ -193,27 +191,39 @@ std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Server>> ServerCache::getSer
 }
 
 std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Channel>> ServerCache::getServerChannelIDs(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
-    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Channel>> lReturnVal;
     try {
-        SleepyDiscord::Server lServer = m_servers.at(acrServerID);
-        for(const auto lVal : lServer.channels) {
-            lReturnVal.push_back(lVal.ID);
-        }
+        m_servers.at(acrServerID);
     } catch(const std::out_of_range& e) {
         throw std::out_of_range(std::string("getServerChannelIDs(): ") + e.what());
     }
-    return lReturnVal;
+
+    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Channel>> lChannelIDs;
+    for(const auto& lChannel : m_servers.at(acrServerID).channels) {
+        lChannelIDs.push_back(lChannel.ID);
+    }
+    return lChannelIDs;
 }
 
 std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>> ServerCache::getRoleIDs(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
-    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>> lReturnVal;
-    try {
-        SleepyDiscord::Server lServer = m_servers.at(acrServerID);
-        for(const auto lVal : lServer.roles) {
-            lReturnVal.push_back(lVal.ID);
-        }
+   try {
+        m_servers.at(acrServerID);
     } catch(const std::out_of_range& e) {
-        throw std::out_of_range(std::string("getRoleIDs(): ") + e.what());
+        throw std::out_of_range(std::string("getServerRoleIDs(): ") + e.what());
     }
-    return lReturnVal;
+    
+    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>> lRoleIDs;
+    for(const auto& lRole : m_servers.at(acrServerID).roles) {
+        lRoleIDs.push_back(lRole.ID);
+    }
+    return lRoleIDs;
+}
+
+std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User>>& ServerCache::getBannedUserIDs(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+    try {
+        m_servers.at(acrServerID);
+    } catch(const std::out_of_range& e) {
+        throw std::out_of_range(std::string("getBannedUserIDs(): ") + e.what());
+    }
+
+    return m_bannedUserIDs[acrServerID];
 }

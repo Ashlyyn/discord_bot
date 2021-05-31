@@ -5,7 +5,9 @@
 
 class ServerCache {
 public:
-    void                                    addServer           (const SleepyDiscord::Server& acrServer);
+    // acrBannedUserIDs passed to function since getBans() is a member function of client
+    void addServer    (const SleepyDiscord::Server& acrServer, const std::vector<SleepyDiscord::User>& acrBannedUsers); 
+    void removeServer (const SleepyDiscord::UnavailableServer& acrRemovedServer);
 
     SleepyDiscord::Server&                  getServer           (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
     //SleepyDiscord::Invite                   getInvite           (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const std::string& acrInviteCode);
@@ -18,10 +20,10 @@ public:
 
     std::vector<SleepyDiscord::Server>      getServers          ();
     //std::vector<SleepyDiscord::Connection>  getUserConnetions   ();
-    std::vector<SleepyDiscord::Channel>     getServerChannels   (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
+    std::list<SleepyDiscord::Channel>&      getServerChannels   (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
     //std::vector<SleepyDiscord::User>        getBannedUsers      (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
-    std::vector<SleepyDiscord::Role>        getRoles            (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
-    std::vector<SleepyDiscord::ServerMember>getServerMembers    (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
+    std::list<SleepyDiscord::Role>&         getRoles            (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
+    std::list<SleepyDiscord::ServerMember>& getServerMembers    (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
     std::vector<SleepyDiscord::User>        getUsers            (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
     //std::vector<SleepyDiscord::Webhool>     getServerWebhooks   (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
     //std::vector<SleepyDiscord::Webhool>     getChannelWebhooks  (const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
@@ -35,9 +37,12 @@ public:
     //std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Message>> getPinnedMessageIDs   (const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
     std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Channel>> getServerChannelIDs   (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
     //std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User>>    getBannedUserIDs      (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
-    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>>    getRoleIDs        (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
+    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>>    getRoleIDs            (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
+    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User>>&   getBannedUserIDs      (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
     
 
 private:
     std::unordered_map<std::string, SleepyDiscord::Server> m_servers;
+    std::unordered_map<std::string, std::vector<SleepyDiscord::Snowflake<SleepyDiscord::User>>> m_bannedUserIDs;
+    
 };
