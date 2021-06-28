@@ -20,8 +20,6 @@ void MyClientClass::readConfig() {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
 
-	std::fprintf(stderr, "readConfig()\n");
-
 	if(!std::ifstream("../config.json")) {
 		std::fprintf(stderr, "readConfig(): config.json not found or failed to open, exiting.\n");
 		std::exit(2);
@@ -39,8 +37,6 @@ void MyClientClass::readConfig() {
 void MyClientClass::readServerInfo() {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
-
-	std::fprintf(stderr, "readServerInfo()\n");
 
 	// if server_info.json doesn't exist, create and return early since it will have no data to be parsed
 	if(!std::ifstream("../server_info.json")) {
@@ -111,7 +107,7 @@ void MyClientClass::parseServers() {
 	
 	for (rapidjson::Value::ConstMemberIterator itr = lServerInfoVal.MemberBegin(); itr != lServerInfoVal.MemberEnd(); ++itr) {
 		const std::string lcSnowflake = itr->name.GetString();
-		m_serverBotSettings[lcSnowflake] = ServerBotSettings();
+		m_cache.addServerBotSettings(lcSnowflake);
 		std::array<const char*, 7> lKeys = {
 			"silent", "noLogs", "prefix", "logsChannelID", "botAdminRoleID", "mutedUserIDs", "permissions"
 		};
@@ -127,22 +123,22 @@ void MyClientClass::parseServers() {
 			itr->value["mutedUserIDs"][0].GetString(),	 itr->value["permissions"][0].GetInt(),	  itr->value["permissions"][1].GetInt()
 		);
 		*/
-		m_serverBotSettings.at(lcSnowflake).silent			= itr->value["silent"].GetBool();
-		m_serverBotSettings.at(lcSnowflake).noLogs			= itr->value["noLogs"].GetBool();
-		m_serverBotSettings.at(lcSnowflake).prefix			= itr->value["prefix"].GetString();
-		m_serverBotSettings.at(lcSnowflake).permissions[0]	= itr->value["permissions"].GetArray()[0].GetInt();
-		m_serverBotSettings.at(lcSnowflake).permissions[1]	= itr->value["permissions"].GetArray()[1].GetInt();
+		m_cache.getServerBotSettings(lcSnowflake).silent			= itr->value["silent"].GetBool();
+		m_cache.getServerBotSettings(lcSnowflake).noLogs			= itr->value["noLogs"].GetBool();
+		m_cache.getServerBotSettings(lcSnowflake).prefix			= itr->value["prefix"].GetString();
+		m_cache.getServerBotSettings(lcSnowflake).permissions[0]	= itr->value["permissions"].GetArray()[0].GetInt();
+		m_cache.getServerBotSettings(lcSnowflake).permissions[1]	= itr->value["permissions"].GetArray()[1].GetInt();
 
 		if (!itr->value["logsChannelID"].IsNull()) {
-			m_serverBotSettings.at(lcSnowflake).logsChannelID = itr->value["logsChannelID"].GetString();
+			m_cache.getServerBotSettings(lcSnowflake).logsChannelID = itr->value["logsChannelID"].GetString();
 		}
 		if (!itr->value["botAdminRoleID"].IsNull()) {
-			m_serverBotSettings.at(lcSnowflake).botAdminRoleID = itr->value["botAdminRoleID"].GetString();
+			m_cache.getServerBotSettings(lcSnowflake).botAdminRoleID = itr->value["botAdminRoleID"].GetString();
 		}
 
-		m_serverBotSettings.at(lcSnowflake).mutedUserIDs.resize(itr->value["mutedUserIDs"].Size());
-		for (int i = 0; i < m_serverBotSettings.at(lcSnowflake).mutedUserIDs.size(); i++) {
-			m_serverBotSettings.at(lcSnowflake).mutedUserIDs[i] = itr->value["mutedUserIDs"].GetArray()[i].GetString();
+		m_cache.getServerBotSettings(lcSnowflake).mutedUserIDs.resize(itr->value["mutedUserIDs"].Size());
+		for (int i = 0; i < m_cache.getServerBotSettings(lcSnowflake).mutedUserIDs.size(); i++) {
+			m_cache.getServerBotSettings(lcSnowflake).mutedUserIDs[i] = itr->value["mutedUserIDs"].GetArray()[i].GetString();
 		}
 	}
 }
@@ -216,19 +212,19 @@ void MyClientClass::updateServerInfo(const SleepyDiscord::Snowflake<SleepyDiscor
 	rapidjson::Value::MemberIterator itr = lServerInfoVal.FindMember(lStringVal);
 
 	// and set all values to their correct values from m_serverBotSettings
-	itr->value["silent"].SetBool(m_serverBotSettings.at(acrServerID).silent);
-	itr->value["noLogs"].SetBool(m_serverBotSettings.at(acrServerID).noLogs);
-	itr->value["prefix"].SetString(rapidjson::StringRef(m_serverBotSettings.at(acrServerID).prefix.c_str()));
-	itr->value["logsChannelID"].SetString(rapidjson::StringRef(m_serverBotSettings.at(acrServerID).logsChannelID.string().c_str()));
-	itr->value["botAdminRoleID"].SetString(rapidjson::StringRef(m_serverBotSettings.at(acrServerID).botAdminRoleID.string().c_str()));
-	itr->value["permissions"].GetArray()[0].SetInt(m_serverBotSettings.at(acrServerID).permissions[0]);
-	itr->value["permissions"].GetArray()[1].SetInt(m_serverBotSettings.at(acrServerID).permissions[1]);
+	itr->value["silent"].SetBool(m_cache.getServerBotSettings(acrServerID).silent);
+	itr->value["noLogs"].SetBool(m_cache.getServerBotSettings(acrServerID).noLogs);
+	itr->value["prefix"].SetString(rapidjson::StringRef(m_cache.getServerBotSettings(acrServerID).prefix.c_str()));
+	itr->value["logsChannelID"].SetString(rapidjson::StringRef(m_cache.getServerBotSettings(acrServerID).logsChannelID.string().c_str()));
+	itr->value["botAdminRoleID"].SetString(rapidjson::StringRef(m_cache.getServerBotSettings(acrServerID).botAdminRoleID.string().c_str()));
+	itr->value["permissions"].GetArray()[0].SetInt(m_cache.getServerBotSettings(acrServerID).permissions[0]);
+	itr->value["permissions"].GetArray()[1].SetInt(m_cache.getServerBotSettings(acrServerID).permissions[1]);
 
 	// clear value before adding to prevent duplicates
 	itr->value["mutedUserIDs"].Clear();
-	for (int i = 0; i < m_serverBotSettings.at(acrServerID).mutedUserIDs.size(); i++) {
+	for (int i = 0; i < m_cache.getServerBotSettings(acrServerID).mutedUserIDs.size(); i++) {
 		// and add user IDs to value
-		itr->value["mutedUserIDs"].PushBack(rapidjson::StringRef(m_serverBotSettings.at(acrServerID).mutedUserIDs[i].string().c_str()), lDoc.GetAllocator());
+		itr->value["mutedUserIDs"].PushBack(rapidjson::StringRef(m_cache.getServerBotSettings(acrServerID).mutedUserIDs[i].string().c_str()), lDoc.GetAllocator());
 	}
 
 	// stringify document
@@ -283,7 +279,7 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
     try {
 		std::mutex mutex;
 		mutex.lock();
-	    const std::string& lcrPrefix = m_serverBotSettings[aMessage.serverID].prefix;
+	    const std::string& lcrPrefix = m_cache.getServerBotSettings(aMessage.serverID).prefix;
 		mutex.unlock();
 	    const auto lcWords = split(aMessage.content);
 	    if (aMessage.startsWith(lcrPrefix + "prefix ")) {
@@ -600,18 +596,19 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 	std::mutex mutex;
 
-	std::fprintf(stderr, "onServer()\n");
-
 	m_cache.addServer(aServer, getBans(aServer.ID).vector());
+	for (const auto& lMember : aServer.members) {
+		m_cache.getUsers().insert(lMember.user);
+	}
 
 	try {
 		mutex.lock();
 		// if std::map::at throws std::out_of_range, entry doesn't exist
-		m_serverBotSettings.at(aServer.ID);
+		m_cache.getServerBotSettings(aServer.ID);
 		mutex.unlock();
 	} catch(const std::out_of_range& e) {
 		// if entry doesn't exist, create it and add it to server info
-		m_serverBotSettings[aServer.ID];
+		m_cache.addServerBotSettings(aServer.ID);
 		try {
 			addServerInfo(aServer.ID);
 		} catch(const std::ios_base::failure& e) {
@@ -622,12 +619,11 @@ void MyClientClass::onServer(SleepyDiscord::Server aServer) {
 		mutex.unlock();
 		return;
 	}
-	mutex.unlock();
 }
 
 void MyClientClass::onDeleteServer(SleepyDiscord::UnavailableServer aRemovedServer) {
 	m_cache.removeServer(aRemovedServer);
-	m_serverBotSettings.erase(aRemovedServer.ID);
+	m_cache.getAllServerBotSettings().erase(aRemovedServer.ID);
 	removeServerInfo(aRemovedServer.ID);
 }
 
@@ -664,6 +660,7 @@ void MyClientClass::onMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> aSe
 	std::lock_guard lock(mutex);
 
 	m_cache.getServerMembers(aServerID).push_back(aMember);
+	m_cache.getUsers().insert(aMember.user);
 }
 
 
@@ -685,7 +682,8 @@ void MyClientClass::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Serve
 	if (
 		((std::find(m_cache.getBannedUserIDs(aServerID).begin(), m_cache.getBannedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, false)) != m_cache.getBannedUserIDs(aServerID).end())  ||
 		 (std::find(m_cache.getBannedUserIDs(aServerID).begin(), m_cache.getBannedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, true))  != m_cache.getBannedUserIDs(aServerID).end())) &&
-		(m_kickedUsers.find(aRemovedUser.ID) == m_kickedUsers.end())
+		((std::find(m_cache.getKickedUserIDs(aServerID).begin(), m_cache.getKickedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, false)) == m_cache.getKickedUserIDs(aServerID).end())  &&
+		 (std::find(m_cache.getKickedUserIDs(aServerID).begin(), m_cache.getKickedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, true))  == m_cache.getKickedUserIDs(aServerID).end()))
 	) {
 		// if user was not banned by bot, log ban
 		// if user was banned by bot, ban will have already been logged by ban()
@@ -694,15 +692,21 @@ void MyClientClass::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Serve
 			logAction(aServerID, aRemovedUser, lLog);
 		}
 		// erase user if user was previously kicked, and now banned
-		m_kickedUsers.erase(m_kickedUsers.find(aRemovedUser.ID));
+		if (std::find(m_cache.getKickedUserIDs(aServerID).begin(), m_cache.getKickedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, true)) != m_cache.getKickedUserIDs(aServerID).end()) {
+			m_cache.getKickedUserIDs(aServerID).erase(std::find(m_cache.getKickedUserIDs(aServerID).begin(), m_cache.getKickedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, true)));
+		}
+		else if (std::find(m_cache.getKickedUserIDs(aServerID).begin(), m_cache.getKickedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, false)) != m_cache.getKickedUserIDs(aServerID).end()) {
+			m_cache.getKickedUserIDs(aServerID).erase(std::find(m_cache.getKickedUserIDs(aServerID).begin(), m_cache.getKickedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, false)));
+		}
 	}
 	// else if user was manually kicked, but not banned
 	else if(
 		((std::find(m_cache.getBannedUserIDs(aServerID).begin(), m_cache.getBannedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, false)) == m_cache.getBannedUserIDs(aServerID).end()) &&
-		  std::find(m_cache.getBannedUserIDs(aServerID).begin(), m_cache.getBannedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, true))  == m_cache.getBannedUserIDs(aServerID).end()) ||
-		 (m_kickedUsers.find(aRemovedUser.ID) != m_kickedUsers.end())) {
+		 (std::find(m_cache.getBannedUserIDs(aServerID).begin(), m_cache.getBannedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, true))  == m_cache.getBannedUserIDs(aServerID).end()) &&
+		 (std::find(m_cache.getKickedUserIDs(aServerID).begin(), m_cache.getBannedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, true))  == m_cache.getBannedUserIDs(aServerID).end())) 
+	) {
 		// same as above
-		if(m_kickedUsers.at(aRemovedUser.ID).second == false) {
+		if(std::find(m_cache.getKickedUserIDs(aServerID).begin(), m_cache.getKickedUserIDs(aServerID).end(), std::make_pair(aRemovedUser.ID, false)) != m_cache.getKickedUserIDs(aServerID).end()) {
 			lLog = "**KICKED USER**\n```User: " + aRemovedUser.username + "#" + aRemovedUser.discriminator + "\nBanned by: Unknown\nReason given:\nOn: " + lcTimeStr + "```";
 			logAction(aServerID, aRemovedUser, lLog);
 		}
@@ -724,7 +728,7 @@ void MyClientClass::fn_changePrefix(const SleepyDiscord::Snowflake<SleepyDiscord
 		echo(acrServerID, acrUserID, acrChannelID, lcMessage);
 	}
 	mutex.lock();
-	m_serverBotSettings.at(acrServerID).prefix = acrNewPrefix;
+	m_cache.getServerBotSettings(acrServerID).prefix = acrNewPrefix;
 	mutex.unlock();
 	updateServerInfo(acrServerID);
 }
@@ -737,7 +741,7 @@ void MyClientClass::fn_echo(const SleepyDiscord::Snowflake<SleepyDiscord::Server
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
 
-	if (m_serverBotSettings.at(acrServerID).silent == false) {
+	if (m_cache.getServerBotSettings(acrServerID).silent == false) {
 		sendMessage(acrChannelID, acrMessage);
 	}
 }
@@ -746,10 +750,14 @@ void MyClientClass::fn_dmUser(const SleepyDiscord::Snowflake<SleepyDiscord::Serv
 	std::mutex mutex;
 	mutex.lock();
 
-	if(m_userDMchannelIDs.find(acrDMedUserID) == m_userDMchannelIDs.end()) { // if user DM channel was not already created
-		m_userDMchannelIDs[acrDMedUserID] = SleepyDiscord::Channel(createDirectMessageChannel(acrDMedUserID)).ID;
+	try { // if user DM channel was not already created
+		m_cache.getUserDMchannelID(acrDMedUserID);
 	}
-	const SleepyDiscord::Snowflake<SleepyDiscord::Channel> lcChannelID = m_userDMchannelIDs[acrDMedUserID];
+	catch (const std::exception& e) {
+		m_cache.getUserDMchannelIDs().at(acrDMedUserID) = SleepyDiscord::Channel(createDirectMessageChannel(acrDMedUserID)).ID;
+	}
+
+	const SleepyDiscord::Snowflake<SleepyDiscord::Channel> lcChannelID = m_cache.getUserDMchannelIDs().at(acrDMedUserID);
 
 	mutex.unlock();
 	sendMessage(lcChannelID, acrMessage);
@@ -767,8 +775,8 @@ void MyClientClass::fn_muteText(const SleepyDiscord::Snowflake<SleepyDiscord::Se
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
 
-	if(std::count(m_serverBotSettings.at(acrServerID).mutedUserIDs.begin(), m_serverBotSettings.at(acrServerID).mutedUserIDs.end(), acrMutedUserID) == 0) { // if user is not already text-muted
-		m_serverBotSettings.at(acrServerID).mutedUserIDs.push_back(acrMutedUserID);
+	if(std::count(m_cache.getServerBotSettings(acrServerID).mutedUserIDs.begin(), m_cache.getServerBotSettings(acrServerID).mutedUserIDs.end(), acrMutedUserID) == 0) { // if user is not already text-muted
+		m_cache.getServerBotSettings(acrServerID).mutedUserIDs.push_back(acrMutedUserID);
 	}
 }
 
@@ -776,17 +784,17 @@ void MyClientClass::fn_unmuteText(const SleepyDiscord::Snowflake<SleepyDiscord::
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
 
-	if(std::count(m_serverBotSettings.at(acrServerID).mutedUserIDs.begin(), m_serverBotSettings.at(acrServerID).mutedUserIDs.end(), acrMutedUserID) > 0) { // if user is text-muted, remove from mutedUserIDs
-		m_serverBotSettings.at(acrServerID).mutedUserIDs.erase(std::find(m_serverBotSettings.at(acrServerID).mutedUserIDs.begin(), m_serverBotSettings.at(acrServerID).mutedUserIDs.end(), acrMutedUserID)); 
+	if(std::count(m_cache.getServerBotSettings(acrServerID).mutedUserIDs.begin(), m_cache.getServerBotSettings(acrServerID).mutedUserIDs.end(), acrMutedUserID) > 0) { // if user is text-muted, remove from mutedUserIDs
+		m_cache.getServerBotSettings(acrServerID).mutedUserIDs.erase(std::find(m_cache.getServerBotSettings(acrServerID).mutedUserIDs.begin(), m_cache.getServerBotSettings(acrServerID).mutedUserIDs.end(), acrMutedUserID)); 
 	}
 }
 
 void MyClientClass::fn_kick(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrKickedUserID, const std::string& acrReason) {
 	std::mutex mutex;
 
-	SleepyDiscord::User lKickedUser = m_cache.getUser(acrServerID, acrKickedUserID);
+	SleepyDiscord::User lKickedUser = m_cache.getMember(acrServerID, acrKickedUserID);
 	mutex.lock();
-	m_kickedUsers[acrKickedUserID] = std::make_pair(lKickedUser, true); // bool value set to true to indicate kick via bot
+	m_cache.addKickedUser(acrServerID, acrKickedUserID, true); // bool value set to true to indicate kick via bot
 	mutex.unlock();
 	kickMember(acrServerID, lKickedUser);
 	std::time_t lTime = std::time(nullptr);
@@ -796,7 +804,7 @@ void MyClientClass::fn_kick(const SleepyDiscord::Snowflake<SleepyDiscord::Server
 	const std::string lcTimeStr = lTimeSS.str(); // hacky time_t thing again
 	std::string lLog;
 
-	SleepyDiscord::User lUser = m_cache.getUser(acrServerID, acrUserID);
+	SleepyDiscord::User lUser = m_cache.getMember(acrServerID, acrUserID);
 	if(acrReason == "") {
 		lLog = std::string("**KICKED USER**\n```User: " + lKickedUser.username + "#" + lKickedUser.discriminator + "\nBanned by: " + lUser.username + "#" + lUser.discriminator + "\nReason given:\nOn: " + lcTimeStr + "```");
 	} else {
@@ -809,7 +817,7 @@ void MyClientClass::fn_ban(const SleepyDiscord::Snowflake<SleepyDiscord::Server>
 	std::mutex mutex;
 	std::lock_guard<std::mutex> lock(mutex);
 
-	SleepyDiscord::User lBannedUser = m_cache.getUser(acrServerID, acrBannedUserID);
+	SleepyDiscord::User lBannedUser = m_cache.getMember(acrServerID, acrBannedUserID);
 	m_cache.getBannedUserIDs(acrServerID).push_back(std::make_pair(lBannedUser, true)); // bool value set to true to indicate ban via bot
 	banMember(acrServerID, lBannedUser, acDeleteMessageDays, acrReason);
 	std::time_t lTime = std::time(nullptr);
@@ -819,7 +827,7 @@ void MyClientClass::fn_ban(const SleepyDiscord::Snowflake<SleepyDiscord::Server>
 	const std::string lcTimeStr = lTimeSS.str(); // hacky time thing yet again
 	std::string lLog;
 
-	SleepyDiscord::User lUser = m_cache.getUser(acrServerID, acrUserID);
+	SleepyDiscord::User lUser = m_cache.getMember(acrServerID, acrUserID);
 	if(acrReason == "") {
 		lLog = std::string("**BANNED USER**\n```User: " + lBannedUser.username + "#" + lBannedUser.discriminator + "\nBanned by: " + lUser.username + "#" + lUser.discriminator + "\nReason given:\nOn: " + lcTimeStr + "```");
 	} else {
@@ -834,7 +842,7 @@ void MyClientClass::fn_unban(const SleepyDiscord::Snowflake<SleepyDiscord::Serve
 
 	for(const auto& lUser : lBannedUsers) {
 		if(lUser.first == acrBannedUserID) {
-			lBannedUser = m_cache.getUser(acrServerID, lUser.first);
+			lBannedUser = m_cache.getMember(acrServerID, lUser.first);
 		}
 	}
 
@@ -886,10 +894,10 @@ void MyClientClass::fn_setBotAdminRole(const SleepyDiscord::Snowflake<SleepyDisc
 	std::mutex mutex;
 
 	mutex.lock();
-	m_serverBotSettings.at(acrServerID).botAdminRoleID = acrRoleID;
+	m_cache.getServerBotSettings(acrServerID).botAdminRoleID = acrRoleID;
 	mutex.unlock();
 
-	SleepyDiscord::User lUser = m_cache.getUser(acrServerID, acrUserID);
+	SleepyDiscord::User lUser = m_cache.getMember(acrServerID, acrUserID);
 	logAction(acrServerID, acrUserID, "**BOT ADMIN ROLE SET**\n```Set to: " + acrRoleID.string() + "\nSet by: " + lUser.username + "#" + lUser.discriminator + "\n```");
 }
 
@@ -897,7 +905,7 @@ void MyClientClass::fn_setLogsChannel(const SleepyDiscord::Snowflake<SleepyDisco
 	std::mutex mutex;
 
 	mutex.lock();
-	m_serverBotSettings.at(acrServerID).logsChannelID = acrChannelID;
+	m_cache.getServerBotSettings(acrServerID).logsChannelID = acrChannelID;
 	mutex.unlock();
 
 	logAction(acrServerID, acrUserID, "Logs enabled in " + Mention<SleepyDiscord::Snowflake<SleepyDiscord::Channel>>(acrChannelID));
@@ -906,13 +914,13 @@ void MyClientClass::fn_setLogsChannel(const SleepyDiscord::Snowflake<SleepyDisco
 void MyClientClass::fn_logsDisable(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, bool b) {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
-	m_serverBotSettings.at(acrServerID).noLogs = b;
+	m_cache.getServerBotSettings(acrServerID).noLogs = b;
 }
 
 void MyClientClass::fn_setSilent(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, bool b) {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
-	m_serverBotSettings.at(acrServerID).silent = b;
+	m_cache.getServerBotSettings(acrServerID).silent = b;
 }
 
 void MyClientClass::fn_deleteMsg(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, SleepyDiscord::Message& arMessage) {
@@ -925,10 +933,10 @@ void MyClientClass::fn_deleteMsg(const SleepyDiscord::Snowflake<SleepyDiscord::S
 void MyClientClass::fn_logAction(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const std::string& acrString) {
 	std::mutex mutex;
 	mutex.lock();
-	if (m_serverBotSettings.at(acrServerID).noLogs == false) {
-		if (m_serverBotSettings.at(acrServerID).logsChannelID != SleepyDiscord::Snowflake<SleepyDiscord::Channel>()) {
+	if (m_cache.getServerBotSettings(acrServerID).noLogs == false) {
+		if (m_cache.getServerBotSettings(acrServerID).logsChannelID != SleepyDiscord::Snowflake<SleepyDiscord::Channel>()) {
 			mutex.unlock();
-			echo(acrServerID, acrUserID, m_serverBotSettings.at(acrServerID).logsChannelID, acrString);
+			echo(acrServerID, acrUserID, m_cache.getServerBotSettings(acrServerID).logsChannelID, acrString);
 		}
 		else {
 			mutex.unlock();
@@ -944,10 +952,10 @@ void MyClientClass::fn_setPermissions(const SleepyDiscord::Snowflake<SleepyDisco
 
 	mutex.lock();
 	if(aCommandType == ROLE_ALL) {
-		m_serverBotSettings.at(acrServerID).permissions[COMMAND_TYPE::ADMIN] = aCommandPerm;
-		m_serverBotSettings.at(acrServerID).permissions[COMMAND_TYPE::NON_ADMIN] = aCommandPerm;
+		m_cache.getServerBotSettings(acrServerID).permissions[COMMAND_TYPE::ADMIN] = aCommandPerm;
+		m_cache.getServerBotSettings(acrServerID).permissions[COMMAND_TYPE::NON_ADMIN] = aCommandPerm;
 	} else {
-		m_serverBotSettings.at(acrServerID).permissions[aCommandType] = aCommandPerm;
+		m_cache.getServerBotSettings(acrServerID).permissions[aCommandType] = aCommandPerm;
 	}
 	mutex.unlock();
 
@@ -1207,5 +1215,5 @@ bool MyClientClass::isMuted(const SleepyDiscord::Snowflake<SleepyDiscord::Server
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
 
-	return std::count(m_serverBotSettings.at(acrServerID).mutedUserIDs.begin(), m_serverBotSettings.at(acrServerID).mutedUserIDs.end(), acrUserID) >= 1;
+	return std::count(m_cache.getServerBotSettings(acrServerID).mutedUserIDs.begin(), m_cache.getServerBotSettings(acrServerID).mutedUserIDs.end(), acrUserID) >= 1;
 }
