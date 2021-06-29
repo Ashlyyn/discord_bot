@@ -15,8 +15,19 @@ struct UserHash {
 class ServerCache {
 public:
     // acrBannedUserIDs passed to function since getBans() is a member function of client
-    void addServer    (const SleepyDiscord::Server& acrServer, const std::vector<SleepyDiscord::User>& acrBannedUsers); 
-    void removeServer (const SleepyDiscord::UnavailableServer& acrRemovedServer);
+    void addServer      (const SleepyDiscord::Server& acrServer, const std::vector<SleepyDiscord::User>& acrBannedUsers); 
+    void editServer     (const SleepyDiscord::Server& acrServer);
+    void removeServer   (const SleepyDiscord::UnavailableServer& acrRemovedServer);
+    void editMember     (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>>& acrRoles, const std::string& acrNickname);
+    void addRole        (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Role& acrRole);
+    void editRole       (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Role& acrRole);
+    void removeRole     (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID);
+    //void editEmojis   (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const std::vector<SleepyDiscord::Emoji>& acrEmojis);   // TODO
+    void addChannel     (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Channel& acrChannel);
+    void editChannel    (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Channel& acrChannel);
+    void deleteChannel  (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID);
+    void editUser       (const SleepyDiscord::User& acrUser);
+
 
     SleepyDiscord::Server&                  getServer           (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID);
     //SleepyDiscord::Invite                   getInvite           (const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const std::string& acrInviteCode);

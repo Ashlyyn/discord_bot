@@ -9,11 +9,101 @@ void ServerCache::addServer(const SleepyDiscord::Server& acrServer, const std::v
     }
     m_bannedUserIDs[acrServer.ID] = lBannedUserIDs;
 }
+
+void ServerCache::editServer(const SleepyDiscord::Server& acrServer) {
+    m_servers.at(acrServer.ID) = acrServer;
+}
     
 void ServerCache::removeServer(const SleepyDiscord::UnavailableServer& acrRemovedServer) {
     m_servers.erase(acrRemovedServer.ID);
     m_bannedUserIDs.erase(acrRemovedServer.ID);
 }
+
+void ServerCache::editMember(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>>& acrRoles, const std::string& acrNickname) {
+    for (auto& lMember : m_servers.at(acrServerID).members) {
+        if (lMember.user.ID == acrUser.ID) {
+            lMember.user = acrUser;
+            lMember.roles = acrRoles;
+            lMember.nick = acrNickname;
+            break;
+        }
+    }
+}
+
+void ServerCache::addRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Role& acrRole) {
+    m_servers.at(acrServerID).roles.push_back(acrRole);
+}
+
+void ServerCache::editRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Role& acrRole) {
+    for (auto& lRole : m_servers.at(acrServerID).roles) {
+        if (lRole.ID == acrRole.ID) {
+            lRole = acrRole;
+            break;
+        }
+    }
+}
+
+void ServerCache::removeRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
+    for (auto& lRole : m_servers.at(acrServerID).roles) {
+        if (lRole.ID == acrRoleID) {
+            //m_servers.at(acrServerID).roles.erase(std::find(m_servers.at(acrServerID).roles.begin(), m_servers.at(acrServerID).roles.end(), lRole));
+            break;
+        }
+    }
+}
+
+/*
+void ServerCache::editEmojis(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const std::vector<SleepyDiscord::Emoji>& acrEmojis) {
+    // TODO
+}
+*/
+
+void ServerCache::addChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Channel& acrChannel) {
+    for (auto& lChannel : m_servers.at(acrServerID).channels) {     // if channel already exists
+        if (lChannel.ID == acrChannel.ID) {
+            lChannel = acrChannel;
+            return;
+        }
+    }
+    m_servers.at(acrServerID).channels.push_back(acrChannel);
+}
+
+void ServerCache::editChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Channel& acrChannel) {
+    for (auto& lChannel : m_servers.at(acrServerID).channels) {
+        if (lChannel.ID == acrChannel.ID) {
+            lChannel = acrChannel;
+            break;
+        }
+    }
+}
+
+void ServerCache::deleteChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+    for (auto& lChannel : m_servers.at(acrServerID).channels) {
+        if (lChannel.ID == acrChannelID) {
+            m_servers.at(acrServerID).channels.remove(lChannel);
+            break;
+        }
+    }
+}
+
+void ServerCache::editUser(const SleepyDiscord::User& acrUser) {
+    for (auto& lUser : m_users) {
+        if (lUser.ID == acrUser.ID) {
+            m_users.erase(lUser);
+            m_users.insert(acrUser);
+            break;
+        }
+    }
+    for (auto& lServer : m_servers) {
+        for (auto& lMember : lServer.second.members) {
+            if (lMember.user.ID == acrUser.ID) {
+                lMember.user = acrUser;
+            }
+            break;
+        }
+    }
+}
+
 
 /*
 SleepyDiscord::Invite ServerCache::getInvite(const std::string& acrInviteCode) {
