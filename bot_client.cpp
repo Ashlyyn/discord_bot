@@ -627,6 +627,10 @@ void MyClientClass::onDeleteServer(SleepyDiscord::UnavailableServer aRemovedServ
 	removeServerInfo(aRemovedServer.ID);
 }
 
+void MyClientClass::onEditServer(SleepyDiscord::Server aEditedServer) {
+	m_cache.editServer(aEditedServer);
+}
+
 void MyClientClass::onBan(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aBannedUser) {
 	std::mutex mutex;
 	std::lock_guard lock(mutex);
@@ -661,6 +665,10 @@ void MyClientClass::onMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> aSe
 
 	m_cache.getServerMembers(aServerID).push_back(aMember);
 	m_cache.getUsers().insert(aMember.user);
+}
+
+void MyClientClass::onEditMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUser, std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>> aRoles, std::string aNickname) {
+	m_cache.editMember(aServerID, aUser, aRoles, aNickname);
 }
 
 
@@ -719,6 +727,61 @@ void MyClientClass::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Serve
 	}
 	mutex.unlock();
 }
+
+void MyClientClass::onRole(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::Role aNewRole) {
+	m_cache.addRole(aServerID, aNewRole);
+}
+
+void MyClientClass::onEditRole(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::Role aEditedRole) {
+	m_cache.editRole(aServerID, aEditedRole);
+}
+
+void MyClientClass::onDeleteRole(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::Role aDeletedRole) {
+	m_cache.removeRole(aServerID, aDeletedRole.ID);
+}
+
+/*
+void MyClientClass::onEditEmojis(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, std::vector<SleepyDiscord::Emoji> aEmojis) {
+	m_cache.editEmojis(aServerID, aEmojis);
+}
+*/
+
+void MyClientClass::onChannel(SleepyDiscord::Channel aChannel) {
+	m_cache.addChannel(aChannel.serverID, aChannel);
+}
+
+void MyClientClass::onEditChannel(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::Channel aEditedChannel) {
+	m_cache.editChannel(aServerID, aEditedChannel);
+}
+
+void MyClientClass::onDeleteChannel(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::Channel aDeletedChannel) {
+	m_cache.deleteChannel(aServerID, aDeletedChannel.ID);
+}
+
+/*
+void MyClientClass::onPinMessage(SleepyDiscord::Snowflake<SleepyDiscord::Channel> aChannelID, std::string aLastPinTimestamp) {
+	
+}
+*/
+
+void MyClientClass::onEditUser(SleepyDiscord::User aEditedUser) {
+	m_cache.editUser(aEditedUser);
+}
+
+/*
+void onDeleteMessages(SleepyDiscord::Snowflake<SleepyDiscord::Channel> aChannelID, std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Message>> aDeletedMessages) {
+
+}
+*/
+
+/*
+void onEditMessage(SleepyDiscord::MessageRevisions aMessageRevisions) {
+
+}
+*/
+
+
+
 
 void MyClientClass::fn_changePrefix(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrNewPrefix) {
 	std::mutex mutex;

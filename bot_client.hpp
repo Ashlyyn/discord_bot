@@ -70,13 +70,27 @@ public:
 	void removeServerInfo(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID); // remove server info (i.e. if server is deleted)
 
 	// client function overrides
-	void onMessage		(SleepyDiscord::Message aMessage) override;
-	void onServer		(SleepyDiscord::Server aServer) override;
-	void onDeleteServer (SleepyDiscord::UnavailableServer aRemovedServer) override;
-	void onBan			(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUser) override;
-	void onUnban		(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUnbannedUser) override;
-	void onMember		(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::ServerMember aMember) override;
-	void onRemoveMember	(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aRemovedUser) override;
+	void onMessage			(SleepyDiscord::Message aMessage) override;
+	void onServer			(SleepyDiscord::Server aServer) override;
+	void onDeleteServer		(SleepyDiscord::UnavailableServer aRemovedServer) override;
+	void onEditServer		(SleepyDiscord::Server aEditedServer) override;
+	void onBan				(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUser) override;
+	void onUnban			(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUnbannedUser) override;
+	void onMember			(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::ServerMember aMember) override;
+	void onEditMember		(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aUser, std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>> aRoles, std::string aNickname);
+	void onRemoveMember		(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::User aRemovedUser) override;
+	void onRole				(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::Role aNewRole) override;
+	void onEditRole			(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::Role aEditedRole) override;
+	void onDeleteRole		(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::Role aDeletedRole); // not marked as override error
+	//void onEditEmojis		(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, std::vector<SleepyDiscord::Emoji> aEmojis) override;	// TODO
+	void onChannel			(SleepyDiscord::Channel aChannel) override;
+	void onEditChannel		(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::Channel aEditedChannel); // not marked as override error
+	void onDeleteChannel	(SleepyDiscord::Snowflake<SleepyDiscord::Server> aServerID, SleepyDiscord::Channel aDeletedChannel); // not marked as override error
+	//void onPinMessage		(SleepyDiscord::Snowflake<SleepyDiscord::Channel> aChannelID, std::string aLastPinTimestamp) override;				// TODO
+	void onEditUser			(SleepyDiscord::User aEditedUser) override;
+	//void onDeleteMessages	(SleepyDiscord::Snowflake<SleepyDiscord::Channel> aChannelID, std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Message>> aDeletedMessages); //TODO
+	//void onEditMessage		(SleepyDiscord::MessageRevisions aMessageRevisions) override;
+
 
 	// helper functions
 
