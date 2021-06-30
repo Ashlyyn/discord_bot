@@ -384,12 +384,6 @@ void ServerCache::addServerBotSettings(const SleepyDiscord::Snowflake<SleepyDisc
     throw std::runtime_error("addServerBotSettings(): entry already present");
 }
 
-/*
-SleepyDiscord::Invite ServerCache::getInvite(const std::string& acrInviteCode) {
-
-}
-*/
-
 const SleepyDiscord::Server& ServerCache::getServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
     std::mutex mutex;
     std::lock_guard lock(mutex);
@@ -401,24 +395,6 @@ const SleepyDiscord::Server& ServerCache::getServer(const SleepyDiscord::Snowfla
         throw std::out_of_range("getServer(): server not found");
     }
 }
-
-/*
-SleepyDiscord::Invite ServerCache::getInvite(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const std::string& acrInviteCode) {
-    SleepyDiscord::Invite lReturnVal;
-    try {
-        SleepyDiscord::Server lServer = m_servers.at(acrServerID);
-        try {
-            lServer.findChannel(acrInviteCode);
-        } catch(const std::exception& e) {
-            throw std::out_of_range("getInvite(): invite not found in server");
-        }
-    } catch(const std::out_of_range& e) {
-        throw std::out_of_range(std::string("getInvite(): ") + e.what());
-        return SleepyDiscord::Invite();
-    }
-    return lReturnVal;
-}
-*/
 
 const SleepyDiscord::Channel& ServerCache::getChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
     std::mutex mutex;
@@ -433,24 +409,6 @@ const SleepyDiscord::Channel& ServerCache::getChannel(const SleepyDiscord::Snowf
 
     return *m_servers.at(acrServerID).findChannel(acrChannelID);
 }
-
-/*
-SleepyDiscord::Message ServerCache::getMessage(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const SleepyDiscord::Snowflake<SleepyDiscord::Message>& acrMessageID) {
-    SleepyDiscord::Message lReturnVal;
-    try {
-        SleepyDiscord::Server lServer = m_servers.at(acrServerID);
-        try {
-            lServer.findChannel(acrChannelID).findMessage(acrMessageID);
-        } catch(const std::exception& e) {
-            throw std::out_of_range("getMessage(): message not found in server");
-        }
-    } catch(const std::out_of_range& e) {
-        throw std::out_of_range(std::string("getMessage(): ") + e.what());
-        return SleepyDiscord::Message();
-    }
-    return lReturnVal;
-}
-*/
 
 const SleepyDiscord::Role& ServerCache::getRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
     std::mutex mutex;
