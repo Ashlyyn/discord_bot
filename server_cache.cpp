@@ -19,6 +19,12 @@ void ServerCache::removeServer(const SleepyDiscord::UnavailableServer& acrRemove
     m_bannedUserIDs.erase(acrRemovedServer.ID);
 }
 
+void ServerCache::addMember(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::ServerMember& acrMember) {
+    if (std::find(m_servers.at(acrServerID).members.begin(), m_servers.at(acrServerID).members.end(), acrMember) == m_servers.at(acrServerID).members.end()) {
+        m_servers.at(acrServerID).members.push_back(acrMember);
+    }
+}
+
 void ServerCache::editMember(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser, const std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>>& acrRoles, const std::string& acrNickname) {
     for (auto& lMember : m_servers.at(acrServerID).members) {
         if (lMember.user.ID == acrUser.ID) {
@@ -26,6 +32,14 @@ void ServerCache::editMember(const SleepyDiscord::Snowflake<SleepyDiscord::Serve
             lMember.roles = acrRoles;
             lMember.nick = acrNickname;
             break;
+        }
+    }
+}
+
+void ServerCache::removeMember(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::User& acrUser) {
+    for (auto& lMember : m_servers.at(acrServerID).members) {
+        if (lMember.user.ID == acrUser.ID) {
+            m_servers.at(acrServerID).members.erase(std::find(m_servers.at(acrServerID).members.begin(), m_servers.at(acrServerID).members.end(), lMember));
         }
     }
 }
@@ -86,11 +100,14 @@ void ServerCache::deleteChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Se
     }
 }
 
+void ServerCache::addUser(const SleepyDiscord::User& acrUser) {
+    m_users[acrUser.ID] = acrUser;
+}
+
 void ServerCache::editUser(const SleepyDiscord::User& acrUser) {
     for (auto& lUser : m_users) {
-        if (lUser.ID == acrUser.ID) {
-            m_users.erase(lUser);
-            m_users.insert(acrUser);
+        if (lUser.second.ID == acrUser.ID) {
+            m_users.at(acrUser.ID) = acrUser;
             break;
         }
     }
@@ -104,6 +121,39 @@ void ServerCache::editUser(const SleepyDiscord::User& acrUser) {
     }
 }
 
+void ServerCache::addKickedUserID(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, bool b) {
+    m_kickedUserIDs[acrServerID].push_back(std::make_pair(acrUserID, b));
+}
+
+void ServerCache::removeKickedUserID(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
+    if (std::find(m_kickedUserIDs[acrServerID].begin(), m_kickedUserIDs[acrServerID].end(), std::make_pair(acrUserID, false)) != m_kickedUserIDs[acrServerID].end()) {
+        m_kickedUserIDs[acrServerID].erase(std::find(m_kickedUserIDs[acrServerID].begin(), m_kickedUserIDs[acrServerID].end(), std::make_pair(acrUserID, false)));
+    }
+    else if (std::find(m_kickedUserIDs[acrServerID].begin(), m_kickedUserIDs[acrServerID].end(), std::make_pair(acrUserID, true)) != m_kickedUserIDs[acrServerID].end()) {
+        m_kickedUserIDs[acrServerID].erase(std::find(m_kickedUserIDs[acrServerID].begin(), m_kickedUserIDs[acrServerID].end(), std::make_pair(acrUserID, true)));
+    }
+}
+
+void ServerCache::addBannedUserID(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, bool b) {
+    m_bannedUserIDs[acrServerID].push_back(std::make_pair(acrUserID, b));
+}
+
+void ServerCache::removeBannedUserID(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
+    if (std::find(m_bannedUserIDs[acrServerID].begin(), m_bannedUserIDs[acrServerID].end(), std::make_pair(acrUserID, false)) != m_bannedUserIDs[acrServerID].end()) {
+        m_bannedUserIDs[acrServerID].erase(std::find(m_bannedUserIDs[acrServerID].begin(), m_bannedUserIDs[acrServerID].end(), std::make_pair(acrUserID, false)));
+    }
+    else if (std::find(m_bannedUserIDs[acrServerID].begin(), m_bannedUserIDs[acrServerID].end(), std::make_pair(acrUserID, true)) != m_bannedUserIDs[acrServerID].end()) {
+        m_bannedUserIDs[acrServerID].erase(std::find(m_bannedUserIDs[acrServerID].begin(), m_bannedUserIDs[acrServerID].end(), std::make_pair(acrUserID, true)));
+    }
+}
+
+void ServerCache::addUserDMchannelID(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+    m_userDMchannelIDs[acrUserID] = acrChannelID;
+}
+
+void ServerCache::addServerBotSettings(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+    m_serverBotSettings[acrServerID] = ServerBotSettings();
+}
 
 /*
 SleepyDiscord::Invite ServerCache::getInvite(const std::string& acrInviteCode) {
@@ -111,7 +161,7 @@ SleepyDiscord::Invite ServerCache::getInvite(const std::string& acrInviteCode) {
 }
 */
 
-SleepyDiscord::Server& ServerCache::getServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+const SleepyDiscord::Server& ServerCache::getServer(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
     return m_servers.at(acrServerID);
 }
 
@@ -133,20 +183,8 @@ SleepyDiscord::Invite ServerCache::getInvite(const SleepyDiscord::Snowflake<Slee
 }
 */
 
-SleepyDiscord::Channel ServerCache::getChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
-    SleepyDiscord::Channel lReturnVal;
-    try {
-        SleepyDiscord::Server lServer = m_servers.at(acrServerID);
-        try {
-            lServer.findChannel(acrChannelID);
-        } catch(const std::exception& e) {
-            throw std::out_of_range("getChannel(): channel not found in server");
-        }
-    } catch(const std::out_of_range& e) {
-        throw std::out_of_range(std::string("getChannel(): ") + e.what());
-        return SleepyDiscord::Channel();
-    }
-    return lReturnVal;
+const SleepyDiscord::Channel& ServerCache::getChannel(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID) {
+        return *m_servers.at(acrServerID).findChannel(acrChannelID);
 }
 
 /*
@@ -167,54 +205,24 @@ SleepyDiscord::Message ServerCache::getMessage(const SleepyDiscord::Snowflake<Sl
 }
 */
 
-/*
-SleepyDiscord::User ServerCache::getRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
-    SleepyDiscord::ServerMember lReturnVal;
-    try {
-        SleepyDiscord::Server lServer = m_servers.at(acrServerID);
-        try {
-            lReturnVal = std::find(lServer.roles.begin(), lServer.roles.end(), acrRoleID);
-        } catch(const std::exception& e) {
-            throw std::out_of_range("getMember(): user not found in server");
-        }
-    } catch(const std::out_of_range& e) {
-        throw std::out_of_range(std::string("getMember(): ") + e.what());
-        return SleepyDiscord::ServerMember();
-    }
-    return lReturnVal;
-}
-*/
-
-SleepyDiscord::User ServerCache::getUser(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
-    for (const auto& lUser : m_users) {
-        if (lUser.ID == acrUserID) {
-            return lUser;
-        }
-    }
-    return SleepyDiscord::User();
+const SleepyDiscord::Role& ServerCache::getRole(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::Role>& acrRoleID) {
+    return *m_servers.at(acrServerID).findRole(acrRoleID);
 }
 
-SleepyDiscord::ServerMember ServerCache::getMember(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
-    SleepyDiscord::ServerMember lReturnVal;
-    try {
-        SleepyDiscord::Server lServer = m_servers.at(acrServerID);
-        try {
-            lReturnVal = *lServer.findMember(acrUserID);
-        } catch(const std::exception& e) {
-            throw std::out_of_range("getMember(): user not found in server");
-        }
-    } catch(const std::out_of_range& e) {
-        throw std::out_of_range(std::string("getMember(): ") + e.what());
-        return SleepyDiscord::ServerMember();
-    }
-    return lReturnVal;
+
+const SleepyDiscord::User& ServerCache::getUser(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
+    return m_users.at(acrUserID);
+}
+
+const SleepyDiscord::ServerMember& ServerCache::getMember(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
+    return *m_servers.at(acrServerID).findMember(acrUserID);
 }
 
 ServerBotSettings& ServerCache::getServerBotSettings(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
     return m_serverBotSettings.at(acrServerID);
 }
 
-SleepyDiscord::Snowflake<SleepyDiscord::Channel> ServerCache::getUserDMchannelID(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
+const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& ServerCache::getUserDMchannelID(const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID) {
     return m_userDMchannelIDs.at(acrUserID);
 }
 
@@ -226,19 +234,19 @@ std::vector<SleepyDiscord::Server> ServerCache::getServers() {
     return lServers;
 }
 
-std::list<SleepyDiscord::Channel>& ServerCache::getServerChannels(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
-    return m_servers.at(acrServerID).channels;
-}
-
-std::unordered_set<SleepyDiscord::User, UserHash>& ServerCache::getUsers() {
+const std::unordered_map<SleepyDiscord::Snowflake<SleepyDiscord::User>, SleepyDiscord::User, UserIDHash>& ServerCache::getUsers() {
     return m_users;
 }
 
-std::list<SleepyDiscord::ServerMember>& ServerCache::getServerMembers(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+const std::list<SleepyDiscord::Channel>& ServerCache::getServerChannels(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+    return m_servers.at(acrServerID).channels;
+}
+
+const std::list<SleepyDiscord::ServerMember>& ServerCache::getServerMembers(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
     return m_servers.at(acrServerID).members;
 }
 
-std::list<SleepyDiscord::Role>& ServerCache::getRoles(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+const std::list<SleepyDiscord::Role>& ServerCache::getRoles(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
     return m_servers.at(acrServerID).roles;
 }
 
@@ -249,16 +257,13 @@ std::vector<SleepyDiscord::User> ServerCache::getKickedUsers(const SleepyDiscord
     }
     return lVec;
 }
+
 std::vector<SleepyDiscord::User> ServerCache::getBannedUsers(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
     std::vector<SleepyDiscord::User> lVec;
     for (const auto& lUserID : m_bannedUserIDs.at(acrServerID)) {
         lVec.push_back(getUser(lUserID.first));
     }
     return lVec;
-}
-
-void ServerCache::addKickedUser(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, bool b) {
-    m_kickedUserIDs[acrServerID].push_back(std::make_pair(acrUserID, b));
 }
 
 std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Server>> ServerCache::getServerIDs() {
@@ -269,20 +274,20 @@ std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Server>> ServerCache::getSer
     return lServerIDs;
 }
 
-std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Channel>> ServerCache::getServerChannelIDs(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
-    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Channel>> lChannelIDs;
-    for(const auto& lChannel : m_servers.at(acrServerID).channels) {
-        lChannelIDs.push_back(lChannel.ID);
-    }
-    return lChannelIDs;
-}
-
-std::unordered_map<std::string, ServerBotSettings>& ServerCache::getAllServerBotSettings() {
+std::unordered_map<SleepyDiscord::Snowflake<SleepyDiscord::Server>, ServerBotSettings, ServerIDHash>& ServerCache::getAllServerBotSettings() {
     return m_serverBotSettings;
 }
 
-std::unordered_map<std::string, SleepyDiscord::Snowflake<SleepyDiscord::Channel>>& ServerCache::getUserDMchannelIDs() {
+const std::unordered_map<SleepyDiscord::Snowflake<SleepyDiscord::User>, SleepyDiscord::Snowflake<SleepyDiscord::Channel>, UserIDHash>& ServerCache::getUserDMchannelIDs() {
     return m_userDMchannelIDs;
+}
+
+std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Channel>> ServerCache::getServerChannelIDs(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+    std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Channel>> lChannelIDs;
+    for (const auto& lChannel : m_servers.at(acrServerID).channels) {
+        lChannelIDs.push_back(lChannel.ID);
+    }
+    return lChannelIDs;
 }
 
 std::vector<SleepyDiscord::Snowflake<SleepyDiscord::ServerMember>> ServerCache::getServerMemberIDs(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
@@ -301,14 +306,10 @@ std::vector<SleepyDiscord::Snowflake<SleepyDiscord::Role>> ServerCache::getRoleI
     return lRoleIDs;
 }
 
-std::vector<std::pair<SleepyDiscord::Snowflake<SleepyDiscord::User>, bool>>& ServerCache::getKickedUserIDs(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+const std::vector<std::pair<SleepyDiscord::Snowflake<SleepyDiscord::User>, bool>>& ServerCache::getKickedUserIDs(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
     return m_kickedUserIDs.at(acrServerID);
 }
 
-std::vector<std::pair<SleepyDiscord::Snowflake<SleepyDiscord::User>, bool>>& ServerCache::getBannedUserIDs(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
+const std::vector<std::pair<SleepyDiscord::Snowflake<SleepyDiscord::User>, bool>>& ServerCache::getBannedUserIDs(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
     return m_bannedUserIDs.at(acrServerID);
-}
-
-void ServerCache::addServerBotSettings(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID) {
-    m_serverBotSettings[acrServerID] = ServerBotSettings();
 }
