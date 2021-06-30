@@ -280,7 +280,13 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 	    const std::string& lcrPrefix = m_cache.getServerBotSettings(aMessage.serverID).prefix;
 	    const auto lcWords = split(aMessage.content);
 	    if (aMessage.startsWith(lcrPrefix + "prefix ")) {
-	    	changePrefix(aMessage.serverID, aMessage.author, aMessage.channelID, aMessage.content.substr(lcrPrefix.size() + changePrefix.name().size() + 1));
+			try {
+				changePrefix(aMessage.serverID, aMessage.author, aMessage.channelID, aMessage.content.substr(lcrPrefix.size() + changePrefix.name().size() + 1));
+			}
+			catch (const std::runtime_error& e) {
+				const std::string lcMessage = "Error: prefix may not contain whitespace.";
+				echo(aMessage.serverID, s_botID, aMessage.channelID, lcMessage);
+			}
 	    } else if (aMessage.startsWith(lcrPrefix + "hello")) {
 	    	hello(aMessage.serverID, aMessage.author, aMessage.channelID);
 	    } else if (aMessage.startsWith(lcrPrefix + "echo ")) {
@@ -290,33 +296,68 @@ void MyClientClass::onMessage(SleepyDiscord::Message aMessage) {
 	    	try {
 	    		lSnowflake = getSnowflake(lcWords[1]);
 		    } catch(std::exception& e) {
-                const std::string lcError = std::string("dm: ") + e.what();
-			    throw std::runtime_error(lcError);
+				const std::string lcMessage = "Error: first argument is not a valid user mention or snowflake\nSyntax of `dm` is `dm <userID> <message...>";
+				echo(aMessage.serverID, s_botID, aMessage.channelID, lcMessage);
+				return;
 		    }
 		    dmUser(aMessage.serverID, aMessage.author, lSnowflake, aMessage.content.substr(lcrPrefix.size() + dmUser.name().size() + 1 + lcWords[1].size() + 1));
-	    } else if (aMessage.startsWith(lcrPrefix + "mute voice ")) {
-	    	muteVoice(aMessage.serverID, aMessage.author, aMessage.content.substr(lcrPrefix.size() + muteVoice.name().size() + 1));
-	    } else if (aMessage.startsWith(lcrPrefix + "unmute voice ")) {
-	    	unmuteVoice(aMessage.serverID, aMessage.author, aMessage.content.substr(lcrPrefix.size() + unmuteVoice.name().size() + 1));
-	    } else if (aMessage.startsWith(lcrPrefix + "mute text ")) {
-	    	std::string lSnowflake;
-	    	try {
-		    	lSnowflake = getSnowflake(lcWords[2]);
-		    } catch(std::exception& e) {
-                const std::string lcError = std::string("mute text: ") + e.what();
-			    throw std::runtime_error(lcError);
-		    }
-		    muteText(aMessage.serverID, aMessage.author, lSnowflake);
-	    } else if (aMessage.startsWith(lcrPrefix + "unmute text ")) {
-		    std::string lSnowflake;
-		    try {
-		    	lSnowflake = getSnowflake(lcWords[2]);
-		    } catch(std::exception& e) {
-                const std::string lcError = std::string("unmute text: ") + e.what();
-		    	throw std::runtime_error(lcError);
-		    }
-		    unmuteText(aMessage.serverID, aMessage.author, lSnowflake);
-    	} else if (aMessage.startsWith(lcrPrefix + "kick ")) {
+	    } else if (aMessage.startsWith(lcrPrefix + "mute")) {
+			if (aMessage.startsWith(lcrPrefix + "mute voice ")) {
+				std::string lSnowflake;
+				try {
+					lSnowflake = getSnowflake(lcWords[2]);
+				}
+				catch (const std::runtime_error& e) {
+					const std::string lcMessage = "Error: first argument is not a valid user mention or snowflake\nSyntax of `mute voice` is `mute voice <@member>`";
+					echo(aMessage.serverID, s_botID, aMessage.channelID, lcMessage);
+					return;
+				}
+				muteVoice(aMessage.serverID, aMessage.author, lSnowflake);
+			}
+			else if (aMessage.startsWith(lcrPrefix + "mute text ")) {
+				std::string lSnowflake;
+				try {
+					lSnowflake = getSnowflake(lcWords[2]);
+				}
+				catch (std::exception& e) {
+					const std::string lcMessage = "Error: first argument is not a valid user mention or snowflake\nSyntax of `mute text` is `mute text <@member>`";
+					echo(aMessage.serverID, s_botID, aMessage.channelID, lcMessage);
+					return;
+				}
+				muteText(aMessage.serverID, aMessage.author, lSnowflake);
+			} else {
+				const std::string lcMessage = "Error: command not found.\nCommands starting with mute:\n\tmute text\n\tmute voice";
+				echo(aMessage.serverID, s_botID, aMessage.channelID, lcMessage);
+				return;
+			}
+		} else if (aMessage.startsWith(lcrPrefix + "unmute")) {
+			if (aMessage.startsWith(lcrPrefix + "unmute voice")) {
+				std::string lSnowflake;
+				try {
+					lSnowflake = getSnowflake(lcWords[2]);
+				} catch (std::exception& e) {
+					const std::string lcMessage = "Error: first argument is not a valid user mention or snowflake\nSyntax of `unmute voice` is `unmute voice <@member>`";
+					echo(aMessage.serverID, s_botID, aMessage.channelID, lcMessage);
+					return;
+				}
+				unmuteVoice(aMessage.serverID, aMessage.author, lSnowflake);
+			} else if (aMessage.startsWith(lcrPrefix + "unmute text ")) {
+				std::string lSnowflake;
+				try {
+					lSnowflake = getSnowflake(lcWords[2]);
+				}
+				catch (std::exception& e) {
+					const std::string lcMessage = "Error: first argument is not a valid user mention or snowflake\nSyntax of `unmute text` is `unmute text <@member>`";
+					echo(aMessage.serverID, s_botID, aMessage.channelID, lcMessage);
+					return;
+				}
+				unmuteText(aMessage.serverID, aMessage.author, lSnowflake);
+			} else {
+				const std::string lcMessage = "Error: command not found.\nCommands starting with unmute:\n\tunmute text\n\tunmute voice";
+				echo(aMessage.serverID, s_botID, aMessage.channelID, lcMessage);
+				return;
+			}
+		} else if (aMessage.startsWith(lcrPrefix + "kick ")) {
     		std::string lSnowflake;
 	    	try {
 		    	lSnowflake = getSnowflake(lcWords[1]);
@@ -751,9 +792,8 @@ void onEditMessage(SleepyDiscord::MessageRevisions aMessageRevisions) {
 
 
 void MyClientClass::fn_changePrefix(const SleepyDiscord::Snowflake<SleepyDiscord::Server>& acrServerID, const SleepyDiscord::Snowflake<SleepyDiscord::User>& acrUserID, const SleepyDiscord::Snowflake<SleepyDiscord::Channel>& acrChannelID, const std::string& acrNewPrefix) {
-	if(acrNewPrefix.find(" ") != std::string::npos) {
-		const std::string lcMessage = "Prefix may not contain whitespace.";
-		echo(acrServerID, acrUserID, acrChannelID, lcMessage);
+	if(acrNewPrefix.find_first_of("\t\n ") != std::string::npos) {
+		throw std::runtime_error("fn_changePrefix(): string contains whitespace");
 	}
 	m_cache.getServerBotSettings(acrServerID).prefix = acrNewPrefix;
 	updateServerInfo(acrServerID);
