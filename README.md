@@ -6,7 +6,7 @@ Discord bot created in C++ with Sleepy Discord.
 `experimental` - no guarantees; may or may not even be compiling.
 
 ### Setup
-Create a directory for the project, clone it, and navigate into it.
+Create a directory for the project, clone it passing `--recurse-submoduls`, and navigate into it.
 Create a directory called `build` and navigate into it.
 Run cmake on the parent directory (`cmake ..`). If dependencies of Sleepy Discord are missing (this project has no external dependencies besides Sleepy Discord), acquire them.
 Run `make`.
